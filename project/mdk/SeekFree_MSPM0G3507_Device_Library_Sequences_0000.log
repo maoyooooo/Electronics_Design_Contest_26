@@ -1,0 +1,2029 @@
+/*
+ *  CMSIS Pack Debug Access Sequence Log
+ *  File        : C:\Users\McGRADY\Documents\Work_Space\Electronics Design Contest-26-07\mspm0g3507\project\mdk\SeekFree_MSPM0G3507_Device_Library_Sequences_0000.log
+ *  Created     : 18:54:10 (13/07/2026)
+ *  Device      : MSPM0G3507
+ *  PDSC File   : C:/Users/McGRADY/AppData/Local/Arm/Packs/TexasInstruments/MSPM0G1X0X_G3X0X_DFP/1.3.1/TexasInstruments.MSPM0G1X0X_G3X0X_DFP.pdsc
+ *
+ */
+
+[18:54:10.727]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[18:54:10.727]  
+[18:54:10.727]  <debugvars>
+[18:54:10.727]    // Pre-defined
+[18:54:10.727]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[18:54:10.727]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[18:54:10.727]    __dp=0x00000000
+[18:54:10.727]    __ap=0x00000000
+[18:54:10.727]    __traceout=0x00000000      (Trace Disabled)
+[18:54:10.728]    __errorcontrol=0x00000000  (Skip Errors="False")
+[18:54:10.728]    __FlashAddr=0x00000000
+[18:54:10.728]    __FlashLen=0x00000000
+[18:54:10.728]    __FlashArg=0x00000000
+[18:54:10.728]    __FlashOp=0x00000000
+[18:54:10.728]    __Result=0x00000000
+[18:54:10.728]  </debugvars>
+[18:54:10.728]  
+[18:54:10.729]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[18:54:10.729]    <block atomic="false" info="">
+[18:54:10.729]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[18:54:10.729]        // -> [isSWJ <= 0x00000001]
+[18:54:10.729]      __var hasDormant = __protocol & 0x00020000;
+[18:54:10.729]        // -> [hasDormant <= 0x00000000]
+[18:54:10.729]      __var protType   = __protocol & 0x0000FFFF;
+[18:54:10.729]        // -> [protType <= 0x00000002]
+[18:54:10.729]    </block>
+[18:54:10.729]    <control if="protType == 1" while="" timeout="0" info="">
+[18:54:10.729]      // if-block "protType == 1"
+[18:54:10.729]        // =>  FALSE
+[18:54:10.730]      // skip if-block "protType == 1"
+[18:54:10.730]    </control>
+[18:54:10.730]    <control if="protType == 2" while="" timeout="0" info="">
+[18:54:10.730]      // if-block "protType == 2"
+[18:54:10.730]        // =>  TRUE
+[18:54:10.730]      <control if="isSWJ" while="" timeout="0" info="">
+[18:54:10.730]        // if-block "isSWJ"
+[18:54:10.730]          // =>  TRUE
+[18:54:10.731]        <control if="hasDormant" while="" timeout="0" info="">
+[18:54:10.731]          // if-block "hasDormant"
+[18:54:10.731]            // =>  FALSE
+[18:54:10.731]          // skip if-block "hasDormant"
+[18:54:10.731]        </control>
+[18:54:10.731]        <control if="!hasDormant" while="" timeout="0" info="">
+[18:54:10.731]          // if-block "!hasDormant"
+[18:54:10.731]            // =>  TRUE
+[18:54:10.731]          <block atomic="false" info="">
+[18:54:10.731]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[18:54:10.732]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:10.732]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[18:54:10.732]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[18:54:10.732]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[18:54:10.732]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:10.733]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[18:54:10.733]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[18:54:10.733]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[18:54:10.733]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:10.733]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[18:54:10.734]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[18:54:10.734]          </block>
+[18:54:10.734]          // end if-block "!hasDormant"
+[18:54:10.734]        </control>
+[18:54:10.734]        // end if-block "isSWJ"
+[18:54:10.734]      </control>
+[18:54:10.734]      <control if="!isSWJ" while="" timeout="0" info="">
+[18:54:10.735]        // if-block "!isSWJ"
+[18:54:10.735]          // =>  FALSE
+[18:54:10.735]        // skip if-block "!isSWJ"
+[18:54:10.735]      </control>
+[18:54:10.735]      <block atomic="false" info="">
+[18:54:10.735]        ReadDP(0x0);
+[18:54:10.735]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[18:54:10.735]      </block>
+[18:54:10.736]      // end if-block "protType == 2"
+[18:54:10.736]    </control>
+[18:54:10.736]  </sequence>
+[18:54:10.736]  
+[18:54:10.736]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[18:54:10.736]  
+[18:54:10.737]  <debugvars>
+[18:54:10.737]    // Pre-defined
+[18:54:10.737]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[18:54:10.737]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[18:54:10.737]    __dp=0x00000000
+[18:54:10.737]    __ap=0x00000000
+[18:54:10.737]    __traceout=0x00000000      (Trace Disabled)
+[18:54:10.737]    __errorcontrol=0x00000000  (Skip Errors="False")
+[18:54:10.737]    __FlashAddr=0x00000000
+[18:54:10.737]    __FlashLen=0x00000000
+[18:54:10.738]    __FlashArg=0x00000000
+[18:54:10.738]    __FlashOp=0x00000000
+[18:54:10.738]    __Result=0x00000000
+[18:54:10.738]  </debugvars>
+[18:54:10.738]  
+[18:54:10.738]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[18:54:10.738]    <block atomic="false" info="">
+[18:54:10.738]      __var SW_DP_ABORT       = 0x0;
+[18:54:10.738]        // -> [SW_DP_ABORT <= 0x00000000]
+[18:54:10.739]      __var DP_CTRL_STAT      = 0x4;
+[18:54:10.739]        // -> [DP_CTRL_STAT <= 0x00000004]
+[18:54:10.739]      __var DP_SELECT         = 0x8;
+[18:54:10.739]        // -> [DP_SELECT <= 0x00000008]
+[18:54:10.739]      __var powered_down      = 0;
+[18:54:10.739]        // -> [powered_down <= 0x00000000]
+[18:54:10.739]      WriteDP(DP_SELECT, 0x00000000);
+[18:54:10.739]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[18:54:10.739]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[18:54:10.740]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[18:54:10.740]        // -> [powered_down <= 0x00000001]
+[18:54:10.740]    </block>
+[18:54:10.740]    <control if="powered_down" while="" timeout="0" info="">
+[18:54:10.740]      // if-block "powered_down"
+[18:54:10.740]        // =>  TRUE
+[18:54:10.740]      <block atomic="false" info="">
+[18:54:10.740]        Message(0, "Debug/System power-up request sent");
+[18:54:10.743]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[18:54:10.743]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[18:54:10.743]      </block>
+[18:54:10.743]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[18:54:10.743]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[18:54:10.743]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[18:54:10.743]        // while-condition  =>  FALSE
+[18:54:10.743]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[18:54:10.743]      </control>
+[18:54:10.743]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[18:54:10.743]        // if-block "(__protocol & 0xFFFF) == 1"
+[18:54:10.743]          // =>  FALSE
+[18:54:10.744]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[18:54:10.744]      </control>
+[18:54:10.744]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[18:54:10.744]        // if-block "(__protocol & 0xFFFF) == 2"
+[18:54:10.744]          // =>  TRUE
+[18:54:10.744]        <block atomic="false" info="">
+[18:54:10.744]          Message(0, "executing SWD power up");
+[18:54:10.745]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[18:54:10.746]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[18:54:10.746]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[18:54:10.746]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[18:54:10.746]        </block>
+[18:54:10.746]        // end if-block "(__protocol & 0xFFFF) == 2"
+[18:54:10.746]      </control>
+[18:54:10.747]      // end if-block "powered_down"
+[18:54:10.747]    </control>
+[18:54:10.747]    <block atomic="false" info="">
+[18:54:10.747]      __var DEBUG_PORT_VAL    = 0;
+[18:54:10.747]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[18:54:10.747]      __var ACCESS_POINT_VAL  = 0;
+[18:54:10.747]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[18:54:10.747]      __ap = 1; 
+[18:54:10.747]        // -> [__ap <= 0x00000001]
+[18:54:10.748]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[18:54:10.748]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[18:54:10.748]      __ap = 4;
+[18:54:10.748]        // -> [__ap <= 0x00000004]
+[18:54:10.748]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[18:54:10.749]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:10.749]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[18:54:10.749]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[18:54:10.750]    </block>
+[18:54:10.750]    <block atomic="false" info="">
+[18:54:10.751]      __var nReset = 0x80;
+[18:54:10.751]        // -> [nReset <= 0x00000080]
+[18:54:10.751]      __var canReadPins = 0;
+[18:54:10.751]        // -> [canReadPins <= 0x00000000]
+[18:54:10.751]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[18:54:10.751]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[18:54:10.751]        // -> [canReadPins <= 0x00000001]
+[18:54:10.751]    </block>
+[18:54:10.751]    <control if="" while="1" timeout="200" info="">
+[18:54:10.753]      // while "1"  (timeout="200")
+[18:54:10.753]      // while-condition  =>  TRUE
+[18:54:10.753]      // while "1"  (timeout="200")
+[18:54:10.753]      // while-condition  =>  TRUE
+[18:54:10.753]      // while "1"  (timeout="200")
+[18:54:10.753]      // while-condition  =>  TRUE
+[18:54:10.753]      // while "1"  (timeout="200")
+[18:54:10.753]      // while-condition  =>  TRUE
+[18:54:10.754]      // while "1"  (timeout="200")
+[18:54:10.754]      // while-condition  =>  TRUE
+[18:54:10.754]      // while "1"  (timeout="200")
+[18:54:10.754]      // while-condition  =>  TRUE
+[18:54:10.754]      // while "1"  (timeout="200")
+[18:54:10.754]      // while-condition  =>  TRUE
+[18:54:10.754]      // while "1"  (timeout="200")
+[18:54:10.754]      // while-condition  =>  TRUE
+[18:54:10.754]      // while "1"  (timeout="200")
+[18:54:10.755]      // while-condition  =>  TRUE
+[18:54:10.755]      // while "1"  (timeout="200")
+[18:54:10.755]      // while-condition  =>  TRUE
+[18:54:10.755]      // while "1"  (timeout="200")
+[18:54:10.755]      // while-condition  =>  TRUE
+[18:54:10.755]      // while "1"  (timeout="200")
+[18:54:10.755]      // while-condition  =>  TRUE
+[18:54:10.755]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.756]      // while-condition  =>  TRUE
+[18:54:10.756]      // while "1"  (timeout="200")
+[18:54:10.757]      // while-condition  =>  TRUE
+[18:54:10.757]      // while "1"  (timeout="200")
+[18:54:10.757]      // while  =>  TIMEOUT
+[18:54:10.757]      // end while "1"
+[18:54:10.757]    </control>
+[18:54:10.757]    <control if="canReadPins" while="" timeout="0" info="">
+[18:54:10.757]      // if-block "canReadPins"
+[18:54:10.758]        // =>  TRUE
+[18:54:10.758]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[18:54:10.758]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[18:54:10.758]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[18:54:10.758]        // while-condition  =>  TRUE
+[18:54:10.758]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[18:54:10.758]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[18:54:10.758]        // while-condition  =>  FALSE
+[18:54:10.759]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[18:54:10.759]      </control>
+[18:54:10.759]      // end if-block "canReadPins"
+[18:54:10.759]    </control>
+[18:54:10.759]    <control if="!canReadPins" while="" timeout="0" info="">
+[18:54:10.759]      // if-block "!canReadPins"
+[18:54:10.759]        // =>  FALSE
+[18:54:10.759]      // skip if-block "!canReadPins"
+[18:54:10.759]    </control>
+[18:54:10.760]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[18:54:10.760]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[18:54:10.760]        // =>  TRUE
+[18:54:10.760]      <block atomic="false" info="">
+[18:54:10.760]        WriteAP(0x00, 0x190008);
+[18:54:10.760]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:10.760]        WriteAP(0xF0, 0x01);
+[18:54:10.760]          // -> [WriteAP(0x000000F0, 0x00000001)]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:10.760]      </block>
+[18:54:10.760]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[18:54:10.760]    </control>
+[18:54:10.761]    <control if="(ACCESS_POINT_VAL & 0x00E00000) != 0" while="" timeout="0" info="">
+[18:54:10.761]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[18:54:10.761]        // =>  FALSE
+[18:54:10.761]      // skip if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[18:54:10.761]    </control>
+[18:54:10.761]    <block atomic="false" info="">
+[18:54:10.761]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[18:54:10.762]        // -> [ReadAP(0x00000000) => 0x0079002F]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:10.762]        // -> [ACCESS_POINT_VAL <= 0x0079002F]
+[18:54:10.762]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[18:54:10.763]      __ap = 0; //lets make sure we reset the access point selection
+[18:54:10.763]        // -> [__ap <= 0x00000000]
+[18:54:10.763]    </block>
+[18:54:10.763]  </sequence>
+[18:54:10.763]  
+[18:54:10.765]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[18:54:10.765]  
+[18:54:10.765]  <debugvars>
+[18:54:10.765]    // Pre-defined
+[18:54:10.765]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[18:54:10.765]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[18:54:10.765]    __dp=0x00000000
+[18:54:10.765]    __ap=0x00000000
+[18:54:10.765]    __traceout=0x00000000      (Trace Disabled)
+[18:54:10.766]    __errorcontrol=0x00000000  (Skip Errors="False")
+[18:54:10.766]    __FlashAddr=0x00000000
+[18:54:10.766]    __FlashLen=0x00000000
+[18:54:10.766]    __FlashArg=0x00000000
+[18:54:10.766]    __FlashOp=0x00000000
+[18:54:10.766]    __Result=0x00000000
+[18:54:10.767]  </debugvars>
+[18:54:10.767]  
+[18:54:10.767]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[18:54:10.767]    <block atomic="false" info="">
+[18:54:10.767]      __var deviceID = 0;
+[18:54:10.767]        // -> [deviceID <= 0x00000000]
+[18:54:10.767]      __var version = 0;
+[18:54:10.767]        // -> [version <= 0x00000000]
+[18:54:10.767]      __var partNum = 0;
+[18:54:10.768]        // -> [partNum <= 0x00000000]
+[18:54:10.768]      __var manuf = 0;
+[18:54:10.768]        // -> [manuf <= 0x00000000]
+[18:54:10.768]      __var isMSPM0G1X0X_G3X0X = 0;
+[18:54:10.768]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000000]
+[18:54:10.768]      __var isProduction = 0;
+[18:54:10.768]        // -> [isProduction <= 0x00000000]
+[18:54:10.768]      __var continueId = 0;
+[18:54:10.768]        // -> [continueId <= 0x00000000]
+[18:54:10.768]      deviceID =   Read32(0x41C40004);
+[18:54:10.769]        // -> [Read32(0x41C40004) => 0x2BB8802F]   (__dp=0x00000000, __ap=0x00000000)
+[18:54:10.769]        // -> [deviceID <= 0x2BB8802F]
+[18:54:10.769]      version = deviceID >> 28;
+[18:54:10.769]        // -> [version <= 0x00000002]
+[18:54:10.769]      partNum = (deviceID & 0x0FFFF000) >> 12;
+[18:54:10.770]        // -> [partNum <= 0x0000BB88]
+[18:54:10.770]      manuf = (deviceID & 0x00000FFE) >> 1;
+[18:54:10.770]        // -> [manuf <= 0x00000017]
+[18:54:10.770]      isMSPM0G1X0X_G3X0X = (partNum == 0xBB88) && (manuf == 0x17);
+[18:54:10.770]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000001]
+[18:54:10.770]      isProduction = (version > 0);
+[18:54:10.770]        // -> [isProduction <= 0x00000001]
+[18:54:10.770]    </block>
+[18:54:10.770]    <control if="!isMSPM0G1X0X_G3X0X" while="" timeout="0" info="">
+[18:54:10.770]      // if-block "!isMSPM0G1X0X_G3X0X"
+[18:54:10.770]        // =>  FALSE
+[18:54:10.770]      // skip if-block "!isMSPM0G1X0X_G3X0X"
+[18:54:10.771]    </control>
+[18:54:10.771]    <control if="continueId == 4" while="" timeout="0" info="">
+[18:54:10.771]      // if-block "continueId == 4"
+[18:54:10.771]        // =>  FALSE
+[18:54:10.771]      // skip if-block "continueId == 4"
+[18:54:10.771]    </control>
+[18:54:10.771]    <control if="!isProduction" while="" timeout="0" info="">
+[18:54:10.771]      // if-block "!isProduction"
+[18:54:10.771]        // =>  FALSE
+[18:54:10.771]      // skip if-block "!isProduction"
+[18:54:10.772]    </control>
+[18:54:10.772]  </sequence>
+[18:54:10.772]  
+[18:54:11.972]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[18:54:11.972]  
+[18:54:11.974]  <debugvars>
+[18:54:11.974]    // Pre-defined
+[18:54:11.974]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[18:54:11.974]    __connection=0x00000201    (Connection Type="Debug", Reset Type="System Reset")
+[18:54:11.974]    __dp=0x00000000
+[18:54:11.974]    __ap=0x00000000
+[18:54:11.974]    __traceout=0x00000000      (Trace Disabled)
+[18:54:11.974]    __errorcontrol=0x00000000  (Skip Errors="False")
+[18:54:11.974]    __FlashAddr=0x00000000
+[18:54:11.974]    __FlashLen=0x00000000
+[18:54:11.974]    __FlashArg=0x00000000
+[18:54:11.976]    __FlashOp=0x00000000
+[18:54:11.976]    __Result=0x00000000
+[18:54:11.976]  </debugvars>
+[18:54:11.976]  
+[18:54:11.976]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[18:54:11.976]    <block atomic="false" info="">
+[18:54:11.976]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[18:54:11.976]        // -> [isSWJ <= 0x00000001]
+[18:54:11.976]      __var hasDormant = __protocol & 0x00020000;
+[18:54:11.977]        // -> [hasDormant <= 0x00000000]
+[18:54:11.977]      __var protType   = __protocol & 0x0000FFFF;
+[18:54:11.977]        // -> [protType <= 0x00000002]
+[18:54:11.977]    </block>
+[18:54:11.977]    <control if="protType == 1" while="" timeout="0" info="">
+[18:54:11.977]      // if-block "protType == 1"
+[18:54:11.977]        // =>  FALSE
+[18:54:11.978]      // skip if-block "protType == 1"
+[18:54:11.978]    </control>
+[18:54:11.978]    <control if="protType == 2" while="" timeout="0" info="">
+[18:54:11.978]      // if-block "protType == 2"
+[18:54:11.979]        // =>  TRUE
+[18:54:11.979]      <control if="isSWJ" while="" timeout="0" info="">
+[18:54:11.979]        // if-block "isSWJ"
+[18:54:11.979]          // =>  TRUE
+[18:54:11.979]        <control if="hasDormant" while="" timeout="0" info="">
+[18:54:11.979]          // if-block "hasDormant"
+[18:54:11.979]            // =>  FALSE
+[18:54:11.979]          // skip if-block "hasDormant"
+[18:54:11.979]        </control>
+[18:54:11.979]        <control if="!hasDormant" while="" timeout="0" info="">
+[18:54:11.979]          // if-block "!hasDormant"
+[18:54:11.979]            // =>  TRUE
+[18:54:11.979]          <block atomic="false" info="">
+[18:54:11.979]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[18:54:11.980]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:11.980]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[18:54:11.980]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[18:54:11.981]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[18:54:11.981]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:11.981]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[18:54:11.981]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[18:54:11.981]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[18:54:11.982]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[18:54:11.982]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[18:54:11.983]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[18:54:11.983]          </block>
+[18:54:11.983]          // end if-block "!hasDormant"
+[18:54:11.983]        </control>
+[18:54:11.983]        // end if-block "isSWJ"
+[18:54:11.983]      </control>
+[18:54:11.983]      <control if="!isSWJ" while="" timeout="0" info="">
+[18:54:11.984]        // if-block "!isSWJ"
+[18:54:11.984]          // =>  FALSE
+[18:54:11.984]        // skip if-block "!isSWJ"
+[18:54:11.984]      </control>
+[18:54:11.984]      <block atomic="false" info="">
+[18:54:11.985]        ReadDP(0x0);
+[18:54:11.985]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[18:54:11.985]      </block>
+[18:54:11.985]      // end if-block "protType == 2"
+[18:54:11.985]    </control>
+[18:54:11.985]  </sequence>
+[18:54:11.985]  
+[18:54:11.986]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[18:54:11.986]  
+[18:54:11.986]  <debugvars>
+[18:54:11.986]    // Pre-defined
+[18:54:11.986]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[18:54:11.986]    __connection=0x00000201    (Connection Type="Debug", Reset Type="System Reset")
+[18:54:11.986]    __dp=0x00000000
+[18:54:11.987]    __ap=0x00000000
+[18:54:11.987]    __traceout=0x00000000      (Trace Disabled)
+[18:54:11.987]    __errorcontrol=0x00000000  (Skip Errors="False")
+[18:54:11.987]    __FlashAddr=0x00000000
+[18:54:11.987]    __FlashLen=0x00000000
+[18:54:11.987]    __FlashArg=0x00000000
+[18:54:11.987]    __FlashOp=0x00000000
+[18:54:11.988]    __Result=0x00000000
+[18:54:11.988]  </debugvars>
+[18:54:11.988]  
+[18:54:11.988]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[18:54:11.988]    <block atomic="false" info="">
+[18:54:11.988]      __var SW_DP_ABORT       = 0x0;
+[18:54:11.989]        // -> [SW_DP_ABORT <= 0x00000000]
+[18:54:11.989]      __var DP_CTRL_STAT      = 0x4;
+[18:54:11.989]        // -> [DP_CTRL_STAT <= 0x00000004]
+[18:54:11.989]      __var DP_SELECT         = 0x8;
+[18:54:11.989]        // -> [DP_SELECT <= 0x00000008]
+[18:54:11.989]      __var powered_down      = 0;
+[18:54:11.989]        // -> [powered_down <= 0x00000000]
+[18:54:11.990]      WriteDP(DP_SELECT, 0x00000000);
+[18:54:11.990]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[18:54:11.990]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[18:54:11.990]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[18:54:11.990]        // -> [powered_down <= 0x00000001]
+[18:54:11.990]    </block>
+[18:54:11.990]    <control if="powered_down" while="" timeout="0" info="">
+[18:54:11.990]      // if-block "powered_down"
+[18:54:11.991]        // =>  TRUE
+[18:54:11.991]      <block atomic="false" info="">
+[18:54:11.991]        Message(0, "Debug/System power-up request sent");
+[18:54:11.993]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[18:54:11.993]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[18:54:11.994]      </block>
+[18:54:11.994]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[18:54:11.994]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[18:54:11.994]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[18:54:11.995]        // while-condition  =>  FALSE
+[18:54:11.996]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[18:54:11.996]      </control>
+[18:54:11.996]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[18:54:11.996]        // if-block "(__protocol & 0xFFFF) == 1"
+[18:54:11.996]          // =>  FALSE
+[18:54:11.997]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[18:54:11.997]      </control>
+[18:54:11.997]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[18:54:11.997]        // if-block "(__protocol & 0xFFFF) == 2"
+[18:54:11.997]          // =>  TRUE
+[18:54:11.997]        <block atomic="false" info="">
+[18:54:11.998]          Message(0, "executing SWD power up");
+[18:54:11.999]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[18:54:12.000]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[18:54:12.000]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[18:54:12.000]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[18:54:12.000]        </block>
+[18:54:12.000]        // end if-block "(__protocol & 0xFFFF) == 2"
+[18:54:12.001]      </control>
+[18:54:12.001]      // end if-block "powered_down"
+[18:54:12.001]    </control>
+[18:54:12.001]    <block atomic="false" info="">
+[18:54:12.002]      __var DEBUG_PORT_VAL    = 0;
+[18:54:12.002]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[18:54:12.002]      __var ACCESS_POINT_VAL  = 0;
+[18:54:12.002]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[18:54:12.002]      __ap = 1; 
+[18:54:12.002]        // -> [__ap <= 0x00000001]
+[18:54:12.002]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[18:54:12.003]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[18:54:12.003]      __ap = 4;
+[18:54:12.003]        // -> [__ap <= 0x00000004]
+[18:54:12.003]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[18:54:12.004]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:12.004]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[18:54:12.004]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[18:54:12.006]    </block>
+[18:54:12.006]    <block atomic="false" info="">
+[18:54:12.006]      __var nReset = 0x80;
+[18:54:12.006]        // -> [nReset <= 0x00000080]
+[18:54:12.006]      __var canReadPins = 0;
+[18:54:12.006]        // -> [canReadPins <= 0x00000000]
+[18:54:12.006]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[18:54:12.006]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[18:54:12.007]        // -> [canReadPins <= 0x00000001]
+[18:54:12.007]    </block>
+[18:54:12.007]    <control if="" while="1" timeout="200" info="">
+[18:54:12.007]      // while "1"  (timeout="200")
+[18:54:12.007]      // while-condition  =>  TRUE
+[18:54:12.007]      // while "1"  (timeout="200")
+[18:54:12.008]      // while-condition  =>  TRUE
+[18:54:12.008]      // while "1"  (timeout="200")
+[18:54:12.008]      // while-condition  =>  TRUE
+[18:54:12.008]      // while "1"  (timeout="200")
+[18:54:12.008]      // while-condition  =>  TRUE
+[18:54:12.008]      // while "1"  (timeout="200")
+[18:54:12.008]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.009]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.009]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.009]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.009]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.009]      // while-condition  =>  TRUE
+[18:54:12.009]      // while "1"  (timeout="200")
+[18:54:12.011]      // while-condition  =>  TRUE
+[18:54:12.011]      // while "1"  (timeout="200")
+[18:54:12.011]      // while-condition  =>  TRUE
+[18:54:12.011]      // while "1"  (timeout="200")
+[18:54:12.011]      // while-condition  =>  TRUE
+[18:54:12.011]      // while "1"  (timeout="200")
+[18:54:12.011]      // while-condition  =>  TRUE
+[18:54:12.011]      // while "1"  (timeout="200")
+[18:54:12.012]      // while-condition  =>  TRUE
+[18:54:12.012]      // while "1"  (timeout="200")
+[18:54:12.012]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.013]      // while-condition  =>  TRUE
+[18:54:12.013]      // while "1"  (timeout="200")
+[18:54:12.014]      // while-condition  =>  TRUE
+[18:54:12.014]      // while "1"  (timeout="200")
+[18:54:12.014]      // while-condition  =>  TRUE
+[18:54:12.014]      // while "1"  (timeout="200")
+[18:54:12.014]      // while-condition  =>  TRUE
+[18:54:12.014]      // while "1"  (timeout="200")
+[18:54:12.015]      // while-condition  =>  TRUE
+[18:54:12.015]      // while "1"  (timeout="200")
+[18:54:12.015]      // while-condition  =>  TRUE
+[18:54:12.015]      // while "1"  (timeout="200")
+[18:54:12.015]      // while-condition  =>  TRUE
+[18:54:12.015]      // while "1"  (timeout="200")
+[18:54:12.015]      // while-condition  =>  TRUE
+[18:54:12.015]      // while "1"  (timeout="200")
+[18:54:12.015]      // while-condition  =>  TRUE
+[18:54:12.015]      // while "1"  (timeout="200")
+[18:54:12.016]      // while-condition  =>  TRUE
+[18:54:12.016]      // while "1"  (timeout="200")
+[18:54:12.016]      // while-condition  =>  TRUE
+[18:54:12.016]      // while "1"  (timeout="200")
+[18:54:12.016]      // while-condition  =>  TRUE
+[18:54:12.016]      // while "1"  (timeout="200")
+[18:54:12.016]      // while-condition  =>  TRUE
+[18:54:12.016]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.017]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.017]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.017]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.017]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.017]      // while "1"  (timeout="200")
+[18:54:12.017]      // while-condition  =>  TRUE
+[18:54:12.018]      // while "1"  (timeout="200")
+[18:54:12.018]      // while-condition  =>  TRUE
+[18:54:12.018]      // while "1"  (timeout="200")
+[18:54:12.018]      // while-condition  =>  TRUE
+[18:54:12.018]      // while "1"  (timeout="200")
+[18:54:12.018]      // while-condition  =>  TRUE
+[18:54:12.018]      // while "1"  (timeout="200")
+[18:54:12.018]      // while-condition  =>  TRUE
+[18:54:12.018]      // while "1"  (timeout="200")
+[18:54:12.019]      // while-condition  =>  TRUE
+[18:54:12.019]      // while "1"  (timeout="200")
+[18:54:12.019]      // while-condition  =>  TRUE
+[18:54:12.019]      // while "1"  (timeout="200")
+[18:54:12.019]      // while-condition  =>  TRUE
+[18:54:12.019]      // while "1"  (timeout="200")
+[18:54:12.019]      // while-condition  =>  TRUE
+[18:54:12.019]      // while "1"  (timeout="200")
+[18:54:12.019]      // while-condition  =>  TRUE
+[18:54:12.019]      // while "1"  (timeout="200")
+[18:54:12.020]      // while-condition  =>  TRUE
+[18:54:12.020]      // while "1"  (timeout="200")
+[18:54:12.020]      // while-condition  =>  TRUE
+[18:54:12.020]      // while "1"  (timeout="200")
+[18:54:12.020]      // while-condition  =>  TRUE
+[18:54:12.020]      // while "1"  (timeout="200")
+[18:54:12.020]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.021]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.021]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.021]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.021]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.021]      // while-condition  =>  TRUE
+[18:54:12.021]      // while "1"  (timeout="200")
+[18:54:12.022]      // while-condition  =>  TRUE
+[18:54:12.022]      // while "1"  (timeout="200")
+[18:54:12.022]      // while  =>  TIMEOUT
+[18:54:12.022]      // end while "1"
+[18:54:12.022]    </control>
+[18:54:12.022]    <control if="canReadPins" while="" timeout="0" info="">
+[18:54:12.022]      // if-block "canReadPins"
+[18:54:12.022]        // =>  TRUE
+[18:54:12.022]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[18:54:12.023]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[18:54:12.023]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[18:54:12.023]        // while-condition  =>  TRUE
+[18:54:12.023]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[18:54:12.023]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[18:54:12.023]        // while-condition  =>  FALSE
+[18:54:12.024]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[18:54:12.024]      </control>
+[18:54:12.024]      // end if-block "canReadPins"
+[18:54:12.024]    </control>
+[18:54:12.024]    <control if="!canReadPins" while="" timeout="0" info="">
+[18:54:12.024]      // if-block "!canReadPins"
+[18:54:12.024]        // =>  FALSE
+[18:54:12.025]      // skip if-block "!canReadPins"
+[18:54:12.025]    </control>
+[18:54:12.025]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[18:54:12.025]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[18:54:12.025]        // =>  TRUE
+[18:54:12.025]      <block atomic="false" info="">
+[18:54:12.026]        WriteAP(0x00, 0x190008);
+[18:54:12.035]  
+[18:54:12.035]  !!! E310 : Debug access failed - cannot write value 0x00190008 to AP register 0x00000000 (AP '0x00000004'))
+[18:54:12.035]  
+[18:54:12.036]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[18:54:12.036]      </block>
+[18:54:12.036]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[18:54:12.036]    </control>
+[18:54:12.037]  </sequence>
+[18:54:12.037]  
+[20:04:42.193]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[20:04:42.193]  
+[20:04:42.193]  <debugvars>
+[20:04:42.193]    // Pre-defined
+[20:04:42.193]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:04:42.193]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:04:42.194]    __dp=0x00000000
+[20:04:42.194]    __ap=0x00000000
+[20:04:42.194]    __traceout=0x00000000      (Trace Disabled)
+[20:04:42.194]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:04:42.194]    __FlashAddr=0x00000000
+[20:04:42.194]    __FlashLen=0x00000000
+[20:04:42.194]    __FlashArg=0x00000000
+[20:04:42.194]    __FlashOp=0x00000000
+[20:04:42.195]    __Result=0x00000000
+[20:04:42.195]  </debugvars>
+[20:04:42.195]  
+[20:04:42.195]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[20:04:42.195]    <block atomic="false" info="">
+[20:04:42.195]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[20:04:42.195]        // -> [isSWJ <= 0x00000001]
+[20:04:42.195]      __var hasDormant = __protocol & 0x00020000;
+[20:04:42.195]        // -> [hasDormant <= 0x00000000]
+[20:04:42.195]      __var protType   = __protocol & 0x0000FFFF;
+[20:04:42.196]        // -> [protType <= 0x00000002]
+[20:04:42.196]    </block>
+[20:04:42.196]    <control if="protType == 1" while="" timeout="0" info="">
+[20:04:42.196]      // if-block "protType == 1"
+[20:04:42.196]        // =>  FALSE
+[20:04:42.196]      // skip if-block "protType == 1"
+[20:04:42.196]    </control>
+[20:04:42.196]    <control if="protType == 2" while="" timeout="0" info="">
+[20:04:42.197]      // if-block "protType == 2"
+[20:04:42.197]        // =>  TRUE
+[20:04:42.197]      <control if="isSWJ" while="" timeout="0" info="">
+[20:04:42.197]        // if-block "isSWJ"
+[20:04:42.197]          // =>  TRUE
+[20:04:42.197]        <control if="hasDormant" while="" timeout="0" info="">
+[20:04:42.197]          // if-block "hasDormant"
+[20:04:42.197]            // =>  FALSE
+[20:04:42.197]          // skip if-block "hasDormant"
+[20:04:42.197]        </control>
+[20:04:42.197]        <control if="!hasDormant" while="" timeout="0" info="">
+[20:04:42.197]          // if-block "!hasDormant"
+[20:04:42.197]            // =>  TRUE
+[20:04:42.199]          <block atomic="false" info="">
+[20:04:42.199]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[20:04:42.199]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:04:42.199]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[20:04:42.200]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[20:04:42.200]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[20:04:42.200]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:04:42.200]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[20:04:42.200]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[20:04:42.200]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[20:04:42.200]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:04:42.200]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[20:04:42.201]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[20:04:42.201]          </block>
+[20:04:42.201]          // end if-block "!hasDormant"
+[20:04:42.201]        </control>
+[20:04:42.201]        // end if-block "isSWJ"
+[20:04:42.201]      </control>
+[20:04:42.201]      <control if="!isSWJ" while="" timeout="0" info="">
+[20:04:42.203]        // if-block "!isSWJ"
+[20:04:42.203]          // =>  FALSE
+[20:04:42.203]        // skip if-block "!isSWJ"
+[20:04:42.203]      </control>
+[20:04:42.203]      <block atomic="false" info="">
+[20:04:42.203]        ReadDP(0x0);
+[20:04:42.203]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[20:04:42.203]      </block>
+[20:04:42.203]      // end if-block "protType == 2"
+[20:04:42.203]    </control>
+[20:04:42.203]  </sequence>
+[20:04:42.203]  
+[20:04:42.204]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[20:04:42.204]  
+[20:04:42.204]  <debugvars>
+[20:04:42.204]    // Pre-defined
+[20:04:42.204]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:04:42.204]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:04:42.204]    __dp=0x00000000
+[20:04:42.204]    __ap=0x00000000
+[20:04:42.204]    __traceout=0x00000000      (Trace Disabled)
+[20:04:42.204]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:04:42.204]    __FlashAddr=0x00000000
+[20:04:42.205]    __FlashLen=0x00000000
+[20:04:42.205]    __FlashArg=0x00000000
+[20:04:42.205]    __FlashOp=0x00000000
+[20:04:42.205]    __Result=0x00000000
+[20:04:42.205]  </debugvars>
+[20:04:42.205]  
+[20:04:42.205]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[20:04:42.205]    <block atomic="false" info="">
+[20:04:42.206]      __var SW_DP_ABORT       = 0x0;
+[20:04:42.206]        // -> [SW_DP_ABORT <= 0x00000000]
+[20:04:42.206]      __var DP_CTRL_STAT      = 0x4;
+[20:04:42.206]        // -> [DP_CTRL_STAT <= 0x00000004]
+[20:04:42.206]      __var DP_SELECT         = 0x8;
+[20:04:42.206]        // -> [DP_SELECT <= 0x00000008]
+[20:04:42.206]      __var powered_down      = 0;
+[20:04:42.206]        // -> [powered_down <= 0x00000000]
+[20:04:42.207]      WriteDP(DP_SELECT, 0x00000000);
+[20:04:42.207]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[20:04:42.207]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[20:04:42.207]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[20:04:42.207]        // -> [powered_down <= 0x00000001]
+[20:04:42.207]    </block>
+[20:04:42.207]    <control if="powered_down" while="" timeout="0" info="">
+[20:04:42.207]      // if-block "powered_down"
+[20:04:42.207]        // =>  TRUE
+[20:04:42.207]      <block atomic="false" info="">
+[20:04:42.209]        Message(0, "Debug/System power-up request sent");
+[20:04:42.210]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[20:04:42.211]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[20:04:42.211]      </block>
+[20:04:42.211]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[20:04:42.211]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[20:04:42.212]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[20:04:42.212]        // while-condition  =>  FALSE
+[20:04:42.212]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[20:04:42.212]      </control>
+[20:04:42.212]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[20:04:42.212]        // if-block "(__protocol & 0xFFFF) == 1"
+[20:04:42.212]          // =>  FALSE
+[20:04:42.212]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[20:04:42.212]      </control>
+[20:04:42.213]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[20:04:42.213]        // if-block "(__protocol & 0xFFFF) == 2"
+[20:04:42.213]          // =>  TRUE
+[20:04:42.213]        <block atomic="false" info="">
+[20:04:42.213]          Message(0, "executing SWD power up");
+[20:04:42.214]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[20:04:42.214]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[20:04:42.214]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[20:04:42.214]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[20:04:42.215]        </block>
+[20:04:42.215]        // end if-block "(__protocol & 0xFFFF) == 2"
+[20:04:42.215]      </control>
+[20:04:42.215]      // end if-block "powered_down"
+[20:04:42.215]    </control>
+[20:04:42.215]    <block atomic="false" info="">
+[20:04:42.215]      __var DEBUG_PORT_VAL    = 0;
+[20:04:42.215]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[20:04:42.216]      __var ACCESS_POINT_VAL  = 0;
+[20:04:42.216]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[20:04:42.216]      __ap = 1; 
+[20:04:42.216]        // -> [__ap <= 0x00000001]
+[20:04:42.216]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[20:04:42.216]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[20:04:42.217]      __ap = 4;
+[20:04:42.217]        // -> [__ap <= 0x00000004]
+[20:04:42.217]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:04:42.217]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[20:04:42.217]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[20:04:42.217]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:04:42.219]    </block>
+[20:04:42.219]    <block atomic="false" info="">
+[20:04:42.219]      __var nReset = 0x80;
+[20:04:42.219]        // -> [nReset <= 0x00000080]
+[20:04:42.219]      __var canReadPins = 0;
+[20:04:42.220]        // -> [canReadPins <= 0x00000000]
+[20:04:42.220]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[20:04:42.220]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:04:42.220]        // -> [canReadPins <= 0x00000001]
+[20:04:42.220]    </block>
+[20:04:42.220]    <control if="" while="1" timeout="200" info="">
+[20:04:42.220]      // while "1"  (timeout="200")
+[20:04:42.220]      // while-condition  =>  TRUE
+[20:04:42.220]      // while "1"  (timeout="200")
+[20:04:42.221]      // while-condition  =>  TRUE
+[20:04:42.221]      // while "1"  (timeout="200")
+[20:04:42.221]      // while-condition  =>  TRUE
+[20:04:42.221]      // while "1"  (timeout="200")
+[20:04:42.221]      // while-condition  =>  TRUE
+[20:04:42.221]      // while "1"  (timeout="200")
+[20:04:42.221]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.222]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.222]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.222]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.222]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.222]      // while-condition  =>  TRUE
+[20:04:42.222]      // while "1"  (timeout="200")
+[20:04:42.223]      // while-condition  =>  TRUE
+[20:04:42.223]      // while "1"  (timeout="200")
+[20:04:42.223]      // while-condition  =>  TRUE
+[20:04:42.223]      // while "1"  (timeout="200")
+[20:04:42.223]      // while-condition  =>  TRUE
+[20:04:42.223]      // while "1"  (timeout="200")
+[20:04:42.223]      // while-condition  =>  TRUE
+[20:04:42.223]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.224]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.224]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.224]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.224]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.224]      // while "1"  (timeout="200")
+[20:04:42.224]      // while-condition  =>  TRUE
+[20:04:42.225]      // while "1"  (timeout="200")
+[20:04:42.225]      // while  =>  TIMEOUT
+[20:04:42.225]      // end while "1"
+[20:04:42.225]    </control>
+[20:04:42.225]    <control if="canReadPins" while="" timeout="0" info="">
+[20:04:42.225]      // if-block "canReadPins"
+[20:04:42.225]        // =>  TRUE
+[20:04:42.226]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[20:04:42.226]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:04:42.226]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:04:42.226]        // while-condition  =>  TRUE
+[20:04:42.226]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:04:42.227]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[20:04:42.227]        // while-condition  =>  FALSE
+[20:04:42.227]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[20:04:42.227]      </control>
+[20:04:42.227]      // end if-block "canReadPins"
+[20:04:42.227]    </control>
+[20:04:42.227]    <control if="!canReadPins" while="" timeout="0" info="">
+[20:04:42.227]      // if-block "!canReadPins"
+[20:04:42.228]        // =>  FALSE
+[20:04:42.228]      // skip if-block "!canReadPins"
+[20:04:42.228]    </control>
+[20:04:42.228]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[20:04:42.228]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:04:42.228]        // =>  TRUE
+[20:04:42.228]      <block atomic="false" info="">
+[20:04:42.228]        WriteAP(0x00, 0x190008);
+[20:04:42.228]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[20:04:42.229]        WriteAP(0xF0, 0x01);
+[20:04:42.229]          // -> [WriteAP(0x000000F0, 0x00000001)]   (__dp=0x00000000, __ap=0x00000004)
+[20:04:42.229]      </block>
+[20:04:42.229]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:04:42.229]    </control>
+[20:04:42.229]    <control if="(ACCESS_POINT_VAL & 0x00E00000) != 0" while="" timeout="0" info="">
+[20:04:42.230]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:04:42.230]        // =>  FALSE
+[20:04:42.230]      // skip if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:04:42.230]    </control>
+[20:04:42.230]    <block atomic="false" info="">
+[20:04:42.230]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:04:42.230]        // -> [ReadAP(0x00000000) => 0x0079002F]   (__dp=0x00000000, __ap=0x00000004)
+[20:04:42.230]        // -> [ACCESS_POINT_VAL <= 0x0079002F]
+[20:04:42.230]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:04:42.231]      __ap = 0; //lets make sure we reset the access point selection
+[20:04:42.232]        // -> [__ap <= 0x00000000]
+[20:04:42.232]    </block>
+[20:04:42.232]  </sequence>
+[20:04:42.232]  
+[20:04:42.233]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[20:04:42.233]  
+[20:04:42.233]  <debugvars>
+[20:04:42.233]    // Pre-defined
+[20:04:42.233]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:04:42.234]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:04:42.234]    __dp=0x00000000
+[20:04:42.234]    __ap=0x00000000
+[20:04:42.234]    __traceout=0x00000000      (Trace Disabled)
+[20:04:42.234]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:04:42.234]    __FlashAddr=0x00000000
+[20:04:42.234]    __FlashLen=0x00000000
+[20:04:42.234]    __FlashArg=0x00000000
+[20:04:42.234]    __FlashOp=0x00000000
+[20:04:42.234]    __Result=0x00000000
+[20:04:42.235]  </debugvars>
+[20:04:42.235]  
+[20:04:42.235]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[20:04:42.235]    <block atomic="false" info="">
+[20:04:42.235]      __var deviceID = 0;
+[20:04:42.235]        // -> [deviceID <= 0x00000000]
+[20:04:42.235]      __var version = 0;
+[20:04:42.236]        // -> [version <= 0x00000000]
+[20:04:42.236]      __var partNum = 0;
+[20:04:42.236]        // -> [partNum <= 0x00000000]
+[20:04:42.236]      __var manuf = 0;
+[20:04:42.236]        // -> [manuf <= 0x00000000]
+[20:04:42.236]      __var isMSPM0G1X0X_G3X0X = 0;
+[20:04:42.236]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000000]
+[20:04:42.236]      __var isProduction = 0;
+[20:04:42.236]        // -> [isProduction <= 0x00000000]
+[20:04:42.236]      __var continueId = 0;
+[20:04:42.237]        // -> [continueId <= 0x00000000]
+[20:04:42.237]      deviceID =   Read32(0x41C40004);
+[20:04:42.237]        // -> [Read32(0x41C40004) => 0x2BB8802F]   (__dp=0x00000000, __ap=0x00000000)
+[20:04:42.237]        // -> [deviceID <= 0x2BB8802F]
+[20:04:42.237]      version = deviceID >> 28;
+[20:04:42.237]        // -> [version <= 0x00000002]
+[20:04:42.237]      partNum = (deviceID & 0x0FFFF000) >> 12;
+[20:04:42.237]        // -> [partNum <= 0x0000BB88]
+[20:04:42.237]      manuf = (deviceID & 0x00000FFE) >> 1;
+[20:04:42.239]        // -> [manuf <= 0x00000017]
+[20:04:42.239]      isMSPM0G1X0X_G3X0X = (partNum == 0xBB88) && (manuf == 0x17);
+[20:04:42.239]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000001]
+[20:04:42.239]      isProduction = (version > 0);
+[20:04:42.239]        // -> [isProduction <= 0x00000001]
+[20:04:42.239]    </block>
+[20:04:42.239]    <control if="!isMSPM0G1X0X_G3X0X" while="" timeout="0" info="">
+[20:04:42.239]      // if-block "!isMSPM0G1X0X_G3X0X"
+[20:04:42.240]        // =>  FALSE
+[20:04:42.240]      // skip if-block "!isMSPM0G1X0X_G3X0X"
+[20:04:42.240]    </control>
+[20:04:42.240]    <control if="continueId == 4" while="" timeout="0" info="">
+[20:04:42.240]      // if-block "continueId == 4"
+[20:04:42.240]        // =>  FALSE
+[20:04:42.240]      // skip if-block "continueId == 4"
+[20:04:42.240]    </control>
+[20:04:42.240]    <control if="!isProduction" while="" timeout="0" info="">
+[20:04:42.240]      // if-block "!isProduction"
+[20:04:42.240]        // =>  FALSE
+[20:04:42.240]      // skip if-block "!isProduction"
+[20:04:42.241]    </control>
+[20:04:42.241]  </sequence>
+[20:04:42.241]  
+[20:07:38.230]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[20:07:38.230]  
+[20:07:38.231]  <debugvars>
+[20:07:38.231]    // Pre-defined
+[20:07:38.231]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:07:38.231]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:07:38.231]    __dp=0x00000000
+[20:07:38.232]    __ap=0x00000000
+[20:07:38.232]    __traceout=0x00000000      (Trace Disabled)
+[20:07:38.232]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:07:38.232]    __FlashAddr=0x00000000
+[20:07:38.232]    __FlashLen=0x00000000
+[20:07:38.232]    __FlashArg=0x00000000
+[20:07:38.232]    __FlashOp=0x00000000
+[20:07:38.232]    __Result=0x00000000
+[20:07:38.233]  </debugvars>
+[20:07:38.233]  
+[20:07:38.233]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[20:07:38.233]    <block atomic="false" info="">
+[20:07:38.233]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[20:07:38.233]        // -> [isSWJ <= 0x00000001]
+[20:07:38.233]      __var hasDormant = __protocol & 0x00020000;
+[20:07:38.233]        // -> [hasDormant <= 0x00000000]
+[20:07:38.233]      __var protType   = __protocol & 0x0000FFFF;
+[20:07:38.233]        // -> [protType <= 0x00000002]
+[20:07:38.233]    </block>
+[20:07:38.233]    <control if="protType == 1" while="" timeout="0" info="">
+[20:07:38.234]      // if-block "protType == 1"
+[20:07:38.234]        // =>  FALSE
+[20:07:38.234]      // skip if-block "protType == 1"
+[20:07:38.234]    </control>
+[20:07:38.234]    <control if="protType == 2" while="" timeout="0" info="">
+[20:07:38.234]      // if-block "protType == 2"
+[20:07:38.234]        // =>  TRUE
+[20:07:38.234]      <control if="isSWJ" while="" timeout="0" info="">
+[20:07:38.234]        // if-block "isSWJ"
+[20:07:38.235]          // =>  TRUE
+[20:07:38.235]        <control if="hasDormant" while="" timeout="0" info="">
+[20:07:38.235]          // if-block "hasDormant"
+[20:07:38.235]            // =>  FALSE
+[20:07:38.235]          // skip if-block "hasDormant"
+[20:07:38.235]        </control>
+[20:07:38.235]        <control if="!hasDormant" while="" timeout="0" info="">
+[20:07:38.235]          // if-block "!hasDormant"
+[20:07:38.235]            // =>  TRUE
+[20:07:38.235]          <block atomic="false" info="">
+[20:07:38.235]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[20:07:38.236]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:07:38.237]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[20:07:38.237]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[20:07:38.237]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[20:07:38.237]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:07:38.237]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[20:07:38.238]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[20:07:38.238]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[20:07:38.238]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:07:38.238]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[20:07:38.238]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[20:07:38.238]          </block>
+[20:07:38.238]          // end if-block "!hasDormant"
+[20:07:38.239]        </control>
+[20:07:38.239]        // end if-block "isSWJ"
+[20:07:38.239]      </control>
+[20:07:38.239]      <control if="!isSWJ" while="" timeout="0" info="">
+[20:07:38.239]        // if-block "!isSWJ"
+[20:07:38.239]          // =>  FALSE
+[20:07:38.239]        // skip if-block "!isSWJ"
+[20:07:38.239]      </control>
+[20:07:38.239]      <block atomic="false" info="">
+[20:07:38.239]        ReadDP(0x0);
+[20:07:38.240]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[20:07:38.240]      </block>
+[20:07:38.241]      // end if-block "protType == 2"
+[20:07:38.241]    </control>
+[20:07:38.241]  </sequence>
+[20:07:38.241]  
+[20:07:38.241]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[20:07:38.241]  
+[20:07:38.241]  <debugvars>
+[20:07:38.241]    // Pre-defined
+[20:07:38.241]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:07:38.241]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:07:38.241]    __dp=0x00000000
+[20:07:38.241]    __ap=0x00000000
+[20:07:38.241]    __traceout=0x00000000      (Trace Disabled)
+[20:07:38.242]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:07:38.242]    __FlashAddr=0x00000000
+[20:07:38.242]    __FlashLen=0x00000000
+[20:07:38.242]    __FlashArg=0x00000000
+[20:07:38.242]    __FlashOp=0x00000000
+[20:07:38.242]    __Result=0x00000000
+[20:07:38.242]  </debugvars>
+[20:07:38.242]  
+[20:07:38.243]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[20:07:38.243]    <block atomic="false" info="">
+[20:07:38.243]      __var SW_DP_ABORT       = 0x0;
+[20:07:38.243]        // -> [SW_DP_ABORT <= 0x00000000]
+[20:07:38.243]      __var DP_CTRL_STAT      = 0x4;
+[20:07:38.243]        // -> [DP_CTRL_STAT <= 0x00000004]
+[20:07:38.243]      __var DP_SELECT         = 0x8;
+[20:07:38.243]        // -> [DP_SELECT <= 0x00000008]
+[20:07:38.243]      __var powered_down      = 0;
+[20:07:38.243]        // -> [powered_down <= 0x00000000]
+[20:07:38.243]      WriteDP(DP_SELECT, 0x00000000);
+[20:07:38.244]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[20:07:38.244]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[20:07:38.244]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[20:07:38.244]        // -> [powered_down <= 0x00000001]
+[20:07:38.244]    </block>
+[20:07:38.244]    <control if="powered_down" while="" timeout="0" info="">
+[20:07:38.245]      // if-block "powered_down"
+[20:07:38.245]        // =>  TRUE
+[20:07:38.245]      <block atomic="false" info="">
+[20:07:38.245]        Message(0, "Debug/System power-up request sent");
+[20:07:38.246]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[20:07:38.246]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[20:07:38.247]      </block>
+[20:07:38.247]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[20:07:38.247]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[20:07:38.247]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[20:07:38.247]        // while-condition  =>  FALSE
+[20:07:38.247]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[20:07:38.247]      </control>
+[20:07:38.247]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[20:07:38.247]        // if-block "(__protocol & 0xFFFF) == 1"
+[20:07:38.248]          // =>  FALSE
+[20:07:38.248]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[20:07:38.248]      </control>
+[20:07:38.248]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[20:07:38.248]        // if-block "(__protocol & 0xFFFF) == 2"
+[20:07:38.248]          // =>  TRUE
+[20:07:38.248]        <block atomic="false" info="">
+[20:07:38.248]          Message(0, "executing SWD power up");
+[20:07:38.250]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[20:07:38.251]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[20:07:38.251]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[20:07:38.251]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[20:07:38.251]        </block>
+[20:07:38.251]        // end if-block "(__protocol & 0xFFFF) == 2"
+[20:07:38.252]      </control>
+[20:07:38.252]      // end if-block "powered_down"
+[20:07:38.252]    </control>
+[20:07:38.252]    <block atomic="false" info="">
+[20:07:38.252]      __var DEBUG_PORT_VAL    = 0;
+[20:07:38.252]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[20:07:38.252]      __var ACCESS_POINT_VAL  = 0;
+[20:07:38.253]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[20:07:38.253]      __ap = 1; 
+[20:07:38.253]        // -> [__ap <= 0x00000001]
+[20:07:38.253]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[20:07:38.253]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[20:07:38.253]      __ap = 4;
+[20:07:38.254]        // -> [__ap <= 0x00000004]
+[20:07:38.254]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:07:38.254]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[20:07:38.254]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[20:07:38.254]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:07:38.255]    </block>
+[20:07:38.256]    <block atomic="false" info="">
+[20:07:38.256]      __var nReset = 0x80;
+[20:07:38.256]        // -> [nReset <= 0x00000080]
+[20:07:38.256]      __var canReadPins = 0;
+[20:07:38.256]        // -> [canReadPins <= 0x00000000]
+[20:07:38.256]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[20:07:38.256]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:07:38.257]        // -> [canReadPins <= 0x00000001]
+[20:07:38.257]    </block>
+[20:07:38.257]    <control if="" while="1" timeout="200" info="">
+[20:07:38.257]      // while "1"  (timeout="200")
+[20:07:38.257]      // while-condition  =>  TRUE
+[20:07:38.257]      // while "1"  (timeout="200")
+[20:07:38.257]      // while-condition  =>  TRUE
+[20:07:38.257]      // while "1"  (timeout="200")
+[20:07:38.257]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.258]      // while "1"  (timeout="200")
+[20:07:38.258]      // while-condition  =>  TRUE
+[20:07:38.259]      // while "1"  (timeout="200")
+[20:07:38.259]      // while-condition  =>  TRUE
+[20:07:38.259]      // while "1"  (timeout="200")
+[20:07:38.259]      // while-condition  =>  TRUE
+[20:07:38.260]      // while "1"  (timeout="200")
+[20:07:38.260]      // while-condition  =>  TRUE
+[20:07:38.260]      // while "1"  (timeout="200")
+[20:07:38.260]      // while-condition  =>  TRUE
+[20:07:38.260]      // while "1"  (timeout="200")
+[20:07:38.260]      // while-condition  =>  TRUE
+[20:07:38.260]      // while "1"  (timeout="200")
+[20:07:38.260]      // while-condition  =>  TRUE
+[20:07:38.261]      // while "1"  (timeout="200")
+[20:07:38.261]      // while-condition  =>  TRUE
+[20:07:38.261]      // while "1"  (timeout="200")
+[20:07:38.261]      // while-condition  =>  TRUE
+[20:07:38.261]      // while "1"  (timeout="200")
+[20:07:38.261]      // while-condition  =>  TRUE
+[20:07:38.261]      // while "1"  (timeout="200")
+[20:07:38.261]      // while-condition  =>  TRUE
+[20:07:38.261]      // while "1"  (timeout="200")
+[20:07:38.262]      // while-condition  =>  TRUE
+[20:07:38.262]      // while "1"  (timeout="200")
+[20:07:38.262]      // while-condition  =>  TRUE
+[20:07:38.262]      // while "1"  (timeout="200")
+[20:07:38.262]      // while-condition  =>  TRUE
+[20:07:38.262]      // while "1"  (timeout="200")
+[20:07:38.262]      // while-condition  =>  TRUE
+[20:07:38.262]      // while "1"  (timeout="200")
+[20:07:38.262]      // while-condition  =>  TRUE
+[20:07:38.262]      // while "1"  (timeout="200")
+[20:07:38.263]      // while-condition  =>  TRUE
+[20:07:38.263]      // while "1"  (timeout="200")
+[20:07:38.263]      // while-condition  =>  TRUE
+[20:07:38.263]      // while "1"  (timeout="200")
+[20:07:38.263]      // while-condition  =>  TRUE
+[20:07:38.263]      // while "1"  (timeout="200")
+[20:07:38.263]      // while-condition  =>  TRUE
+[20:07:38.263]      // while "1"  (timeout="200")
+[20:07:38.264]      // while-condition  =>  TRUE
+[20:07:38.264]      // while "1"  (timeout="200")
+[20:07:38.264]      // while-condition  =>  TRUE
+[20:07:38.264]      // while "1"  (timeout="200")
+[20:07:38.264]      // while-condition  =>  TRUE
+[20:07:38.264]      // while "1"  (timeout="200")
+[20:07:38.264]      // while-condition  =>  TRUE
+[20:07:38.264]      // while "1"  (timeout="200")
+[20:07:38.265]      // while-condition  =>  TRUE
+[20:07:38.265]      // while "1"  (timeout="200")
+[20:07:38.265]      // while-condition  =>  TRUE
+[20:07:38.265]      // while "1"  (timeout="200")
+[20:07:38.265]      // while-condition  =>  TRUE
+[20:07:38.265]      // while "1"  (timeout="200")
+[20:07:38.265]      // while-condition  =>  TRUE
+[20:07:38.265]      // while "1"  (timeout="200")
+[20:07:38.265]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.266]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.266]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.266]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.266]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.266]      // while-condition  =>  TRUE
+[20:07:38.266]      // while "1"  (timeout="200")
+[20:07:38.267]      // while-condition  =>  TRUE
+[20:07:38.267]      // while "1"  (timeout="200")
+[20:07:38.267]      // while-condition  =>  TRUE
+[20:07:38.267]      // while "1"  (timeout="200")
+[20:07:38.267]      // while-condition  =>  TRUE
+[20:07:38.267]      // while "1"  (timeout="200")
+[20:07:38.267]      // while-condition  =>  TRUE
+[20:07:38.267]      // while "1"  (timeout="200")
+[20:07:38.267]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.268]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.268]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.268]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.268]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.268]      // while-condition  =>  TRUE
+[20:07:38.268]      // while "1"  (timeout="200")
+[20:07:38.269]      // while-condition  =>  TRUE
+[20:07:38.269]      // while "1"  (timeout="200")
+[20:07:38.269]      // while-condition  =>  TRUE
+[20:07:38.269]      // while "1"  (timeout="200")
+[20:07:38.269]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.270]      // while "1"  (timeout="200")
+[20:07:38.270]      // while-condition  =>  TRUE
+[20:07:38.271]      // while "1"  (timeout="200")
+[20:07:38.271]      // while-condition  =>  TRUE
+[20:07:38.271]      // while "1"  (timeout="200")
+[20:07:38.271]      // while-condition  =>  TRUE
+[20:07:38.271]      // while "1"  (timeout="200")
+[20:07:38.271]      // while-condition  =>  TRUE
+[20:07:38.271]      // while "1"  (timeout="200")
+[20:07:38.271]      // while-condition  =>  TRUE
+[20:07:38.271]      // while "1"  (timeout="200")
+[20:07:38.272]      // while-condition  =>  TRUE
+[20:07:38.272]      // while "1"  (timeout="200")
+[20:07:38.272]      // while  =>  TIMEOUT
+[20:07:38.272]      // end while "1"
+[20:07:38.272]    </control>
+[20:07:38.272]    <control if="canReadPins" while="" timeout="0" info="">
+[20:07:38.272]      // if-block "canReadPins"
+[20:07:38.272]        // =>  TRUE
+[20:07:38.272]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[20:07:38.272]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:07:38.273]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:07:38.273]        // while-condition  =>  TRUE
+[20:07:38.273]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:07:38.273]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[20:07:38.273]        // while-condition  =>  FALSE
+[20:07:38.273]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[20:07:38.274]      </control>
+[20:07:38.274]      // end if-block "canReadPins"
+[20:07:38.274]    </control>
+[20:07:38.274]    <control if="!canReadPins" while="" timeout="0" info="">
+[20:07:38.274]      // if-block "!canReadPins"
+[20:07:38.274]        // =>  FALSE
+[20:07:38.274]      // skip if-block "!canReadPins"
+[20:07:38.274]    </control>
+[20:07:38.274]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[20:07:38.275]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:07:38.275]        // =>  TRUE
+[20:07:38.275]      <block atomic="false" info="">
+[20:07:38.275]        WriteAP(0x00, 0x190008);
+[20:07:38.275]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[20:07:38.275]        WriteAP(0xF0, 0x01);
+[20:07:38.276]          // -> [WriteAP(0x000000F0, 0x00000001)]   (__dp=0x00000000, __ap=0x00000004)
+[20:07:38.276]      </block>
+[20:07:38.276]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:07:38.276]    </control>
+[20:07:38.276]    <control if="(ACCESS_POINT_VAL & 0x00E00000) != 0" while="" timeout="0" info="">
+[20:07:38.276]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:07:38.276]        // =>  FALSE
+[20:07:38.276]      // skip if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:07:38.276]    </control>
+[20:07:38.276]    <block atomic="false" info="">
+[20:07:38.277]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:07:38.277]        // -> [ReadAP(0x00000000) => 0x0079002F]   (__dp=0x00000000, __ap=0x00000004)
+[20:07:38.277]        // -> [ACCESS_POINT_VAL <= 0x0079002F]
+[20:07:38.277]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:07:38.278]      __ap = 0; //lets make sure we reset the access point selection
+[20:07:38.279]        // -> [__ap <= 0x00000000]
+[20:07:38.279]    </block>
+[20:07:38.279]  </sequence>
+[20:07:38.279]  
+[20:07:38.280]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[20:07:38.280]  
+[20:07:38.280]  <debugvars>
+[20:07:38.281]    // Pre-defined
+[20:07:38.281]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:07:38.281]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:07:38.281]    __dp=0x00000000
+[20:07:38.281]    __ap=0x00000000
+[20:07:38.281]    __traceout=0x00000000      (Trace Disabled)
+[20:07:38.281]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:07:38.281]    __FlashAddr=0x00000000
+[20:07:38.282]    __FlashLen=0x00000000
+[20:07:38.282]    __FlashArg=0x00000000
+[20:07:38.282]    __FlashOp=0x00000000
+[20:07:38.282]    __Result=0x00000000
+[20:07:38.282]  </debugvars>
+[20:07:38.282]  
+[20:07:38.282]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[20:07:38.282]    <block atomic="false" info="">
+[20:07:38.282]      __var deviceID = 0;
+[20:07:38.282]        // -> [deviceID <= 0x00000000]
+[20:07:38.283]      __var version = 0;
+[20:07:38.283]        // -> [version <= 0x00000000]
+[20:07:38.283]      __var partNum = 0;
+[20:07:38.283]        // -> [partNum <= 0x00000000]
+[20:07:38.283]      __var manuf = 0;
+[20:07:38.283]        // -> [manuf <= 0x00000000]
+[20:07:38.284]      __var isMSPM0G1X0X_G3X0X = 0;
+[20:07:38.284]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000000]
+[20:07:38.284]      __var isProduction = 0;
+[20:07:38.284]        // -> [isProduction <= 0x00000000]
+[20:07:38.284]      __var continueId = 0;
+[20:07:38.284]        // -> [continueId <= 0x00000000]
+[20:07:38.284]      deviceID =   Read32(0x41C40004);
+[20:07:38.285]        // -> [Read32(0x41C40004) => 0x2BB8802F]   (__dp=0x00000000, __ap=0x00000000)
+[20:07:38.285]        // -> [deviceID <= 0x2BB8802F]
+[20:07:38.285]      version = deviceID >> 28;
+[20:07:38.285]        // -> [version <= 0x00000002]
+[20:07:38.285]      partNum = (deviceID & 0x0FFFF000) >> 12;
+[20:07:38.285]        // -> [partNum <= 0x0000BB88]
+[20:07:38.285]      manuf = (deviceID & 0x00000FFE) >> 1;
+[20:07:38.286]        // -> [manuf <= 0x00000017]
+[20:07:38.286]      isMSPM0G1X0X_G3X0X = (partNum == 0xBB88) && (manuf == 0x17);
+[20:07:38.286]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000001]
+[20:07:38.286]      isProduction = (version > 0);
+[20:07:38.286]        // -> [isProduction <= 0x00000001]
+[20:07:38.286]    </block>
+[20:07:38.286]    <control if="!isMSPM0G1X0X_G3X0X" while="" timeout="0" info="">
+[20:07:38.286]      // if-block "!isMSPM0G1X0X_G3X0X"
+[20:07:38.286]        // =>  FALSE
+[20:07:38.286]      // skip if-block "!isMSPM0G1X0X_G3X0X"
+[20:07:38.287]    </control>
+[20:07:38.287]    <control if="continueId == 4" while="" timeout="0" info="">
+[20:07:38.287]      // if-block "continueId == 4"
+[20:07:38.287]        // =>  FALSE
+[20:07:38.287]      // skip if-block "continueId == 4"
+[20:07:38.287]    </control>
+[20:07:38.287]    <control if="!isProduction" while="" timeout="0" info="">
+[20:07:38.287]      // if-block "!isProduction"
+[20:07:38.287]        // =>  FALSE
+[20:07:38.288]      // skip if-block "!isProduction"
+[20:07:38.288]    </control>
+[20:07:38.288]  </sequence>
+[20:07:38.288]  
+[20:08:08.867]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[20:08:08.867]  
+[20:08:08.873]  <debugvars>
+[20:08:08.873]    // Pre-defined
+[20:08:08.873]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:08:08.873]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:08:08.873]    __dp=0x00000000
+[20:08:08.873]    __ap=0x00000000
+[20:08:08.873]    __traceout=0x00000000      (Trace Disabled)
+[20:08:08.873]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:08:08.873]    __FlashAddr=0x00000000
+[20:08:08.873]    __FlashLen=0x00000000
+[20:08:08.874]    __FlashArg=0x00000000
+[20:08:08.874]    __FlashOp=0x00000000
+[20:08:08.874]    __Result=0x00000000
+[20:08:08.874]  </debugvars>
+[20:08:08.874]  
+[20:08:08.874]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[20:08:08.874]    <block atomic="false" info="">
+[20:08:08.874]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[20:08:08.874]        // -> [isSWJ <= 0x00000001]
+[20:08:08.875]      __var hasDormant = __protocol & 0x00020000;
+[20:08:08.875]        // -> [hasDormant <= 0x00000000]
+[20:08:08.875]      __var protType   = __protocol & 0x0000FFFF;
+[20:08:08.875]        // -> [protType <= 0x00000002]
+[20:08:08.875]    </block>
+[20:08:08.875]    <control if="protType == 1" while="" timeout="0" info="">
+[20:08:08.875]      // if-block "protType == 1"
+[20:08:08.875]        // =>  FALSE
+[20:08:08.875]      // skip if-block "protType == 1"
+[20:08:08.875]    </control>
+[20:08:08.875]    <control if="protType == 2" while="" timeout="0" info="">
+[20:08:08.876]      // if-block "protType == 2"
+[20:08:08.876]        // =>  TRUE
+[20:08:08.876]      <control if="isSWJ" while="" timeout="0" info="">
+[20:08:08.876]        // if-block "isSWJ"
+[20:08:08.876]          // =>  TRUE
+[20:08:08.876]        <control if="hasDormant" while="" timeout="0" info="">
+[20:08:08.876]          // if-block "hasDormant"
+[20:08:08.876]            // =>  FALSE
+[20:08:08.876]          // skip if-block "hasDormant"
+[20:08:08.876]        </control>
+[20:08:08.877]        <control if="!hasDormant" while="" timeout="0" info="">
+[20:08:08.877]          // if-block "!hasDormant"
+[20:08:08.877]            // =>  TRUE
+[20:08:08.877]          <block atomic="false" info="">
+[20:08:08.877]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[20:08:08.877]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:08:08.877]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[20:08:08.877]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[20:08:08.878]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[20:08:08.878]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:08:08.878]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[20:08:08.878]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[20:08:08.878]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[20:08:08.878]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:08:08.879]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[20:08:08.879]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[20:08:08.879]          </block>
+[20:08:08.879]          // end if-block "!hasDormant"
+[20:08:08.879]        </control>
+[20:08:08.879]        // end if-block "isSWJ"
+[20:08:08.879]      </control>
+[20:08:08.879]      <control if="!isSWJ" while="" timeout="0" info="">
+[20:08:08.879]        // if-block "!isSWJ"
+[20:08:08.880]          // =>  FALSE
+[20:08:08.880]        // skip if-block "!isSWJ"
+[20:08:08.880]      </control>
+[20:08:08.880]      <block atomic="false" info="">
+[20:08:08.880]        ReadDP(0x0);
+[20:08:08.880]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[20:08:08.880]      </block>
+[20:08:08.880]      // end if-block "protType == 2"
+[20:08:08.880]    </control>
+[20:08:08.880]  </sequence>
+[20:08:08.881]  
+[20:08:08.881]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[20:08:08.881]  
+[20:08:08.881]  <debugvars>
+[20:08:08.881]    // Pre-defined
+[20:08:08.881]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:08:08.881]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:08:08.881]    __dp=0x00000000
+[20:08:08.881]    __ap=0x00000000
+[20:08:08.882]    __traceout=0x00000000      (Trace Disabled)
+[20:08:08.882]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:08:08.882]    __FlashAddr=0x00000000
+[20:08:08.882]    __FlashLen=0x00000000
+[20:08:08.882]    __FlashArg=0x00000000
+[20:08:08.882]    __FlashOp=0x00000000
+[20:08:08.882]    __Result=0x00000000
+[20:08:08.882]  </debugvars>
+[20:08:08.882]  
+[20:08:08.882]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[20:08:08.882]    <block atomic="false" info="">
+[20:08:08.882]      __var SW_DP_ABORT       = 0x0;
+[20:08:08.883]        // -> [SW_DP_ABORT <= 0x00000000]
+[20:08:08.883]      __var DP_CTRL_STAT      = 0x4;
+[20:08:08.883]        // -> [DP_CTRL_STAT <= 0x00000004]
+[20:08:08.883]      __var DP_SELECT         = 0x8;
+[20:08:08.883]        // -> [DP_SELECT <= 0x00000008]
+[20:08:08.883]      __var powered_down      = 0;
+[20:08:08.883]        // -> [powered_down <= 0x00000000]
+[20:08:08.883]      WriteDP(DP_SELECT, 0x00000000);
+[20:08:08.883]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[20:08:08.884]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[20:08:08.884]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[20:08:08.884]        // -> [powered_down <= 0x00000001]
+[20:08:08.884]    </block>
+[20:08:08.884]    <control if="powered_down" while="" timeout="0" info="">
+[20:08:08.884]      // if-block "powered_down"
+[20:08:08.884]        // =>  TRUE
+[20:08:08.884]      <block atomic="false" info="">
+[20:08:08.884]        Message(0, "Debug/System power-up request sent");
+[20:08:08.886]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[20:08:08.886]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[20:08:08.887]      </block>
+[20:08:08.887]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[20:08:08.887]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[20:08:08.887]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[20:08:08.887]        // while-condition  =>  FALSE
+[20:08:08.887]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[20:08:08.888]      </control>
+[20:08:08.888]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[20:08:08.888]        // if-block "(__protocol & 0xFFFF) == 1"
+[20:08:08.888]          // =>  FALSE
+[20:08:08.888]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[20:08:08.888]      </control>
+[20:08:08.888]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[20:08:08.888]        // if-block "(__protocol & 0xFFFF) == 2"
+[20:08:08.888]          // =>  TRUE
+[20:08:08.888]        <block atomic="false" info="">
+[20:08:08.888]          Message(0, "executing SWD power up");
+[20:08:08.890]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[20:08:08.890]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[20:08:08.890]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[20:08:08.890]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[20:08:08.890]        </block>
+[20:08:08.890]        // end if-block "(__protocol & 0xFFFF) == 2"
+[20:08:08.891]      </control>
+[20:08:08.891]      // end if-block "powered_down"
+[20:08:08.891]    </control>
+[20:08:08.891]    <block atomic="false" info="">
+[20:08:08.891]      __var DEBUG_PORT_VAL    = 0;
+[20:08:08.891]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[20:08:08.891]      __var ACCESS_POINT_VAL  = 0;
+[20:08:08.891]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[20:08:08.891]      __ap = 1; 
+[20:08:08.891]        // -> [__ap <= 0x00000001]
+[20:08:08.892]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[20:08:08.892]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[20:08:08.892]      __ap = 4;
+[20:08:08.892]        // -> [__ap <= 0x00000004]
+[20:08:08.892]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:08:08.893]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[20:08:08.893]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[20:08:08.893]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:08:08.894]    </block>
+[20:08:08.894]    <block atomic="false" info="">
+[20:08:08.895]      __var nReset = 0x80;
+[20:08:08.895]        // -> [nReset <= 0x00000080]
+[20:08:08.895]      __var canReadPins = 0;
+[20:08:08.895]        // -> [canReadPins <= 0x00000000]
+[20:08:08.895]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[20:08:08.895]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:08:08.895]        // -> [canReadPins <= 0x00000001]
+[20:08:08.895]    </block>
+[20:08:08.896]    <control if="" while="1" timeout="200" info="">
+[20:08:08.896]      // while "1"  (timeout="200")
+[20:08:08.896]      // while-condition  =>  TRUE
+[20:08:08.896]      // while "1"  (timeout="200")
+[20:08:08.896]      // while-condition  =>  TRUE
+[20:08:08.896]      // while "1"  (timeout="200")
+[20:08:08.896]      // while-condition  =>  TRUE
+[20:08:08.896]      // while "1"  (timeout="200")
+[20:08:08.896]      // while-condition  =>  TRUE
+[20:08:08.896]      // while "1"  (timeout="200")
+[20:08:08.897]      // while-condition  =>  TRUE
+[20:08:08.897]      // while "1"  (timeout="200")
+[20:08:08.897]      // while  =>  TIMEOUT
+[20:08:08.897]      // end while "1"
+[20:08:08.897]    </control>
+[20:08:08.897]    <control if="canReadPins" while="" timeout="0" info="">
+[20:08:08.897]      // if-block "canReadPins"
+[20:08:08.897]        // =>  TRUE
+[20:08:08.897]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[20:08:08.897]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:08:08.898]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:08:08.898]        // while-condition  =>  TRUE
+[20:08:08.898]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:08:08.898]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[20:08:08.898]        // while-condition  =>  FALSE
+[20:08:08.898]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[20:08:08.898]      </control>
+[20:08:08.898]      // end if-block "canReadPins"
+[20:08:08.899]    </control>
+[20:08:08.899]    <control if="!canReadPins" while="" timeout="0" info="">
+[20:08:08.899]      // if-block "!canReadPins"
+[20:08:08.899]        // =>  FALSE
+[20:08:08.899]      // skip if-block "!canReadPins"
+[20:08:08.899]    </control>
+[20:08:08.899]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[20:08:08.899]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:08:08.899]        // =>  TRUE
+[20:08:08.899]      <block atomic="false" info="">
+[20:08:08.899]        WriteAP(0x00, 0x190008);
+[20:08:08.900]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[20:08:08.900]        WriteAP(0xF0, 0x01);
+[20:08:08.900]          // -> [WriteAP(0x000000F0, 0x00000001)]   (__dp=0x00000000, __ap=0x00000004)
+[20:08:08.901]      </block>
+[20:08:08.901]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:08:08.901]    </control>
+[20:08:08.901]    <control if="(ACCESS_POINT_VAL & 0x00E00000) != 0" while="" timeout="0" info="">
+[20:08:08.901]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:08:08.901]        // =>  FALSE
+[20:08:08.901]      // skip if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:08:08.901]    </control>
+[20:08:08.901]    <block atomic="false" info="">
+[20:08:08.901]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:08:08.902]        // -> [ReadAP(0x00000000) => 0x0079002F]   (__dp=0x00000000, __ap=0x00000004)
+[20:08:08.902]        // -> [ACCESS_POINT_VAL <= 0x0079002F]
+[20:08:08.902]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:08:08.903]      __ap = 0; //lets make sure we reset the access point selection
+[20:08:08.903]        // -> [__ap <= 0x00000000]
+[20:08:08.903]    </block>
+[20:08:08.903]  </sequence>
+[20:08:08.904]  
+[20:08:08.905]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[20:08:08.905]  
+[20:08:08.905]  <debugvars>
+[20:08:08.905]    // Pre-defined
+[20:08:08.905]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:08:08.906]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:08:08.906]    __dp=0x00000000
+[20:08:08.906]    __ap=0x00000000
+[20:08:08.906]    __traceout=0x00000000      (Trace Disabled)
+[20:08:08.906]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:08:08.906]    __FlashAddr=0x00000000
+[20:08:08.906]    __FlashLen=0x00000000
+[20:08:08.906]    __FlashArg=0x00000000
+[20:08:08.906]    __FlashOp=0x00000000
+[20:08:08.906]    __Result=0x00000000
+[20:08:08.907]  </debugvars>
+[20:08:08.907]  
+[20:08:08.907]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[20:08:08.907]    <block atomic="false" info="">
+[20:08:08.907]      __var deviceID = 0;
+[20:08:08.907]        // -> [deviceID <= 0x00000000]
+[20:08:08.907]      __var version = 0;
+[20:08:08.907]        // -> [version <= 0x00000000]
+[20:08:08.907]      __var partNum = 0;
+[20:08:08.907]        // -> [partNum <= 0x00000000]
+[20:08:08.907]      __var manuf = 0;
+[20:08:08.907]        // -> [manuf <= 0x00000000]
+[20:08:08.908]      __var isMSPM0G1X0X_G3X0X = 0;
+[20:08:08.908]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000000]
+[20:08:08.908]      __var isProduction = 0;
+[20:08:08.908]        // -> [isProduction <= 0x00000000]
+[20:08:08.908]      __var continueId = 0;
+[20:08:08.908]        // -> [continueId <= 0x00000000]
+[20:08:08.908]      deviceID =   Read32(0x41C40004);
+[20:08:08.909]        // -> [Read32(0x41C40004) => 0x2BB8802F]   (__dp=0x00000000, __ap=0x00000000)
+[20:08:08.909]        // -> [deviceID <= 0x2BB8802F]
+[20:08:08.910]      version = deviceID >> 28;
+[20:08:08.910]        // -> [version <= 0x00000002]
+[20:08:08.910]      partNum = (deviceID & 0x0FFFF000) >> 12;
+[20:08:08.910]        // -> [partNum <= 0x0000BB88]
+[20:08:08.910]      manuf = (deviceID & 0x00000FFE) >> 1;
+[20:08:08.910]        // -> [manuf <= 0x00000017]
+[20:08:08.910]      isMSPM0G1X0X_G3X0X = (partNum == 0xBB88) && (manuf == 0x17);
+[20:08:08.910]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000001]
+[20:08:08.910]      isProduction = (version > 0);
+[20:08:08.910]        // -> [isProduction <= 0x00000001]
+[20:08:08.910]    </block>
+[20:08:08.910]    <control if="!isMSPM0G1X0X_G3X0X" while="" timeout="0" info="">
+[20:08:08.910]      // if-block "!isMSPM0G1X0X_G3X0X"
+[20:08:08.910]        // =>  FALSE
+[20:08:08.910]      // skip if-block "!isMSPM0G1X0X_G3X0X"
+[20:08:08.910]    </control>
+[20:08:08.911]    <control if="continueId == 4" while="" timeout="0" info="">
+[20:08:08.911]      // if-block "continueId == 4"
+[20:08:08.911]        // =>  FALSE
+[20:08:08.911]      // skip if-block "continueId == 4"
+[20:08:08.911]    </control>
+[20:08:08.911]    <control if="!isProduction" while="" timeout="0" info="">
+[20:08:08.911]      // if-block "!isProduction"
+[20:08:08.911]        // =>  FALSE
+[20:08:08.911]      // skip if-block "!isProduction"
+[20:08:08.911]    </control>
+[20:08:08.911]  </sequence>
+[20:08:08.911]  
+[20:11:08.253]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[20:11:08.253]  
+[20:11:08.254]  <debugvars>
+[20:11:08.255]    // Pre-defined
+[20:11:08.255]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:11:08.255]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:11:08.255]    __dp=0x00000000
+[20:11:08.255]    __ap=0x00000000
+[20:11:08.255]    __traceout=0x00000000      (Trace Disabled)
+[20:11:08.255]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:11:08.255]    __FlashAddr=0x00000000
+[20:11:08.255]    __FlashLen=0x00000000
+[20:11:08.256]    __FlashArg=0x00000000
+[20:11:08.256]    __FlashOp=0x00000000
+[20:11:08.256]    __Result=0x00000000
+[20:11:08.256]  </debugvars>
+[20:11:08.256]  
+[20:11:08.256]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[20:11:08.256]    <block atomic="false" info="">
+[20:11:08.256]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[20:11:08.256]        // -> [isSWJ <= 0x00000001]
+[20:11:08.256]      __var hasDormant = __protocol & 0x00020000;
+[20:11:08.257]        // -> [hasDormant <= 0x00000000]
+[20:11:08.257]      __var protType   = __protocol & 0x0000FFFF;
+[20:11:08.257]        // -> [protType <= 0x00000002]
+[20:11:08.257]    </block>
+[20:11:08.257]    <control if="protType == 1" while="" timeout="0" info="">
+[20:11:08.257]      // if-block "protType == 1"
+[20:11:08.257]        // =>  FALSE
+[20:11:08.257]      // skip if-block "protType == 1"
+[20:11:08.257]    </control>
+[20:11:08.258]    <control if="protType == 2" while="" timeout="0" info="">
+[20:11:08.258]      // if-block "protType == 2"
+[20:11:08.258]        // =>  TRUE
+[20:11:08.258]      <control if="isSWJ" while="" timeout="0" info="">
+[20:11:08.258]        // if-block "isSWJ"
+[20:11:08.258]          // =>  TRUE
+[20:11:08.258]        <control if="hasDormant" while="" timeout="0" info="">
+[20:11:08.259]          // if-block "hasDormant"
+[20:11:08.259]            // =>  FALSE
+[20:11:08.259]          // skip if-block "hasDormant"
+[20:11:08.259]        </control>
+[20:11:08.259]        <control if="!hasDormant" while="" timeout="0" info="">
+[20:11:08.259]          // if-block "!hasDormant"
+[20:11:08.259]            // =>  TRUE
+[20:11:08.260]          <block atomic="false" info="">
+[20:11:08.260]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[20:11:08.261]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:11:08.261]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[20:11:08.261]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[20:11:08.261]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[20:11:08.261]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:11:08.261]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[20:11:08.262]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[20:11:08.262]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[20:11:08.262]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[20:11:08.262]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[20:11:08.262]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[20:11:08.262]          </block>
+[20:11:08.263]          // end if-block "!hasDormant"
+[20:11:08.263]        </control>
+[20:11:08.263]        // end if-block "isSWJ"
+[20:11:08.263]      </control>
+[20:11:08.263]      <control if="!isSWJ" while="" timeout="0" info="">
+[20:11:08.263]        // if-block "!isSWJ"
+[20:11:08.263]          // =>  FALSE
+[20:11:08.263]        // skip if-block "!isSWJ"
+[20:11:08.263]      </control>
+[20:11:08.263]      <block atomic="false" info="">
+[20:11:08.264]        ReadDP(0x0);
+[20:11:08.264]          // -> [ReadDP(0x00000000) => 0x6BA02477]   (__dp=0x00000000)
+[20:11:08.264]      </block>
+[20:11:08.264]      // end if-block "protType == 2"
+[20:11:08.264]    </control>
+[20:11:08.264]  </sequence>
+[20:11:08.264]  
+[20:11:08.265]  **********  Sequence "DebugPortStart"  (Context="Connect", Pname="", info="")
+[20:11:08.265]  
+[20:11:08.265]  <debugvars>
+[20:11:08.265]    // Pre-defined
+[20:11:08.265]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:11:08.265]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:11:08.265]    __dp=0x00000000
+[20:11:08.266]    __ap=0x00000000
+[20:11:08.266]    __traceout=0x00000000      (Trace Disabled)
+[20:11:08.266]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:11:08.266]    __FlashAddr=0x00000000
+[20:11:08.266]    __FlashLen=0x00000000
+[20:11:08.266]    __FlashArg=0x00000000
+[20:11:08.266]    __FlashOp=0x00000000
+[20:11:08.266]    __Result=0x00000000
+[20:11:08.266]  </debugvars>
+[20:11:08.267]  
+[20:11:08.267]  <sequence name="DebugPortStart" Pname="" disable="false" info="">
+[20:11:08.267]    <block atomic="false" info="">
+[20:11:08.267]      __var SW_DP_ABORT       = 0x0;
+[20:11:08.267]        // -> [SW_DP_ABORT <= 0x00000000]
+[20:11:08.267]      __var DP_CTRL_STAT      = 0x4;
+[20:11:08.267]        // -> [DP_CTRL_STAT <= 0x00000004]
+[20:11:08.267]      __var DP_SELECT         = 0x8;
+[20:11:08.267]        // -> [DP_SELECT <= 0x00000008]
+[20:11:08.267]      __var powered_down      = 0;
+[20:11:08.267]        // -> [powered_down <= 0x00000000]
+[20:11:08.268]      WriteDP(DP_SELECT, 0x00000000);
+[20:11:08.268]        // -> [WriteDP(0x00000008, 0x00000000)]   (__dp=0x00000000)
+[20:11:08.268]      powered_down = ((ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000);
+[20:11:08.268]        // -> [ReadDP(0x00000004) => 0x00000040]   (__dp=0x00000000)
+[20:11:08.268]        // -> [powered_down <= 0x00000001]
+[20:11:08.268]    </block>
+[20:11:08.268]    <control if="powered_down" while="" timeout="0" info="">
+[20:11:08.268]      // if-block "powered_down"
+[20:11:08.268]        // =>  TRUE
+[20:11:08.268]      <block atomic="false" info="">
+[20:11:08.269]        Message(0, "Debug/System power-up request sent");
+[20:11:08.270]        WriteDP(DP_CTRL_STAT, 0x50000000);
+[20:11:08.270]          // -> [WriteDP(0x00000004, 0x50000000)]   (__dp=0x00000000)
+[20:11:08.270]      </block>
+[20:11:08.270]      <control if="" while="(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000" timeout="1000000" info="">
+[20:11:08.271]        // while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"  (timeout="1000000")
+[20:11:08.271]          // -> [ReadDP(0x00000004) => 0xF0000040]   (__dp=0x00000000)
+[20:11:08.271]        // while-condition  =>  FALSE
+[20:11:08.271]        // end while "(ReadDP(DP_CTRL_STAT) & 0xA0000000) != 0xA0000000"
+[20:11:08.271]      </control>
+[20:11:08.271]      <control if="(__protocol & 0xFFFF) == 1" while="" timeout="0" info="">
+[20:11:08.271]        // if-block "(__protocol & 0xFFFF) == 1"
+[20:11:08.271]          // =>  FALSE
+[20:11:08.271]        // skip if-block "(__protocol & 0xFFFF) == 1"
+[20:11:08.272]      </control>
+[20:11:08.272]      <control if="(__protocol & 0xFFFF) == 2" while="" timeout="0" info="">
+[20:11:08.272]        // if-block "(__protocol & 0xFFFF) == 2"
+[20:11:08.272]          // =>  TRUE
+[20:11:08.272]        <block atomic="false" info="">
+[20:11:08.272]          Message(0, "executing SWD power up");
+[20:11:08.273]          WriteDP(DP_CTRL_STAT, 0x50000F00);
+[20:11:08.274]            // -> [WriteDP(0x00000004, 0x50000F00)]   (__dp=0x00000000)
+[20:11:08.274]          WriteDP(SW_DP_ABORT, 0x0000001E);
+[20:11:08.274]            // -> [WriteDP(0x00000000, 0x0000001E)]   (__dp=0x00000000)
+[20:11:08.274]        </block>
+[20:11:08.274]        // end if-block "(__protocol & 0xFFFF) == 2"
+[20:11:08.274]      </control>
+[20:11:08.275]      // end if-block "powered_down"
+[20:11:08.275]    </control>
+[20:11:08.275]    <block atomic="false" info="">
+[20:11:08.275]      __var DEBUG_PORT_VAL    = 0;
+[20:11:08.275]        // -> [DEBUG_PORT_VAL <= 0x00000000]
+[20:11:08.275]      __var ACCESS_POINT_VAL  = 0;
+[20:11:08.275]        // -> [ACCESS_POINT_VAL <= 0x00000000]
+[20:11:08.275]      __ap = 1; 
+[20:11:08.275]        // -> [__ap <= 0x00000001]
+[20:11:08.275]      WriteAP(0x0C, 0x04); //lets use the mini pwr-ap as backup
+[20:11:08.276]        // -> [WriteAP(0x0000000C, 0x00000004)]   (__dp=0x00000000, __ap=0x00000001)
+[20:11:08.276]      __ap = 4;
+[20:11:08.276]        // -> [__ap <= 0x00000004]
+[20:11:08.276]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:11:08.276]        // -> [ReadAP(0x00000000) => 0x00080027]   (__dp=0x00000000, __ap=0x00000004)
+[20:11:08.277]        // -> [ACCESS_POINT_VAL <= 0x00080027]
+[20:11:08.277]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:11:08.278]    </block>
+[20:11:08.278]    <block atomic="false" info="">
+[20:11:08.278]      __var nReset = 0x80;
+[20:11:08.278]        // -> [nReset <= 0x00000080]
+[20:11:08.278]      __var canReadPins = 0;
+[20:11:08.278]        // -> [canReadPins <= 0x00000000]
+[20:11:08.279]      canReadPins = (DAP_SWJ_Pins(0x00, nReset, 0) != 0xFFFFFFFF);
+[20:11:08.279]        // -> [DAP_SWJ_Pins(0x00, 0x80, 0) => 0x01]   (Out: nRESET=0  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:11:08.279]        // -> [canReadPins <= 0x00000001]
+[20:11:08.279]    </block>
+[20:11:08.279]    <control if="" while="1" timeout="200" info="">
+[20:11:08.279]      // while "1"  (timeout="200")
+[20:11:08.279]      // while-condition  =>  TRUE
+[20:11:08.279]      // while "1"  (timeout="200")
+[20:11:08.279]      // while-condition  =>  TRUE
+[20:11:08.279]      // while "1"  (timeout="200")
+[20:11:08.279]      // while-condition  =>  TRUE
+[20:11:08.280]      // while "1"  (timeout="200")
+[20:11:08.280]      // while-condition  =>  TRUE
+[20:11:08.280]      // while "1"  (timeout="200")
+[20:11:08.280]      // while-condition  =>  TRUE
+[20:11:08.281]      // while "1"  (timeout="200")
+[20:11:08.281]      // while-condition  =>  TRUE
+[20:11:08.281]      // while "1"  (timeout="200")
+[20:11:08.281]      // while-condition  =>  TRUE
+[20:11:08.281]      // while "1"  (timeout="200")
+[20:11:08.281]      // while-condition  =>  TRUE
+[20:11:08.281]      // while "1"  (timeout="200")
+[20:11:08.281]      // while-condition  =>  TRUE
+[20:11:08.282]      // while "1"  (timeout="200")
+[20:11:08.282]      // while-condition  =>  TRUE
+[20:11:08.282]      // while "1"  (timeout="200")
+[20:11:08.282]      // while-condition  =>  TRUE
+[20:11:08.282]      // while "1"  (timeout="200")
+[20:11:08.282]      // while-condition  =>  TRUE
+[20:11:08.282]      // while "1"  (timeout="200")
+[20:11:08.283]      // while-condition  =>  TRUE
+[20:11:08.283]      // while "1"  (timeout="200")
+[20:11:08.283]      // while-condition  =>  TRUE
+[20:11:08.283]      // while "1"  (timeout="200")
+[20:11:08.283]      // while-condition  =>  TRUE
+[20:11:08.283]      // while "1"  (timeout="200")
+[20:11:08.283]      // while-condition  =>  TRUE
+[20:11:08.283]      // while "1"  (timeout="200")
+[20:11:08.283]      // while-condition  =>  TRUE
+[20:11:08.284]      // while "1"  (timeout="200")
+[20:11:08.284]      // while-condition  =>  TRUE
+[20:11:08.284]      // while "1"  (timeout="200")
+[20:11:08.284]      // while-condition  =>  TRUE
+[20:11:08.284]      // while "1"  (timeout="200")
+[20:11:08.284]      // while-condition  =>  TRUE
+[20:11:08.284]      // while "1"  (timeout="200")
+[20:11:08.284]      // while-condition  =>  TRUE
+[20:11:08.284]      // while "1"  (timeout="200")
+[20:11:08.284]      // while-condition  =>  TRUE
+[20:11:08.285]      // while "1"  (timeout="200")
+[20:11:08.285]      // while-condition  =>  TRUE
+[20:11:08.285]      // while "1"  (timeout="200")
+[20:11:08.285]      // while-condition  =>  TRUE
+[20:11:08.285]      // while "1"  (timeout="200")
+[20:11:08.285]      // while-condition  =>  TRUE
+[20:11:08.285]      // while "1"  (timeout="200")
+[20:11:08.285]      // while-condition  =>  TRUE
+[20:11:08.285]      // while "1"  (timeout="200")
+[20:11:08.286]      // while-condition  =>  TRUE
+[20:11:08.286]      // while "1"  (timeout="200")
+[20:11:08.286]      // while-condition  =>  TRUE
+[20:11:08.286]      // while "1"  (timeout="200")
+[20:11:08.286]      // while-condition  =>  TRUE
+[20:11:08.286]      // while "1"  (timeout="200")
+[20:11:08.286]      // while-condition  =>  TRUE
+[20:11:08.286]      // while "1"  (timeout="200")
+[20:11:08.286]      // while-condition  =>  TRUE
+[20:11:08.287]      // while "1"  (timeout="200")
+[20:11:08.287]      // while-condition  =>  TRUE
+[20:11:08.287]      // while "1"  (timeout="200")
+[20:11:08.287]      // while-condition  =>  TRUE
+[20:11:08.287]      // while "1"  (timeout="200")
+[20:11:08.287]      // while-condition  =>  TRUE
+[20:11:08.287]      // while "1"  (timeout="200")
+[20:11:08.287]      // while-condition  =>  TRUE
+[20:11:08.287]      // while "1"  (timeout="200")
+[20:11:08.288]      // while-condition  =>  TRUE
+[20:11:08.288]      // while "1"  (timeout="200")
+[20:11:08.288]      // while  =>  TIMEOUT
+[20:11:08.288]      // end while "1"
+[20:11:08.288]    </control>
+[20:11:08.288]    <control if="canReadPins" while="" timeout="0" info="">
+[20:11:08.288]      // if-block "canReadPins"
+[20:11:08.288]        // =>  TRUE
+[20:11:08.288]      <control if="" while="(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0" timeout="1000000" info="">
+[20:11:08.288]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:11:08.289]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x01]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=0)
+[20:11:08.289]        // while-condition  =>  TRUE
+[20:11:08.289]        // while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"  (timeout="1000000")
+[20:11:08.289]          // -> [DAP_SWJ_Pins(0x80, 0x80, 0) => 0x81]   (Out: nRESET=1  =>  In: SWCLK/TCK=1, SWDIO/TMS=0, TDI=0, TDO=0, nTRST=0, nRESET=1)
+[20:11:08.289]        // while-condition  =>  FALSE
+[20:11:08.289]        // end while "(DAP_SWJ_Pins(nReset, nReset, 0) & nReset) == 0"
+[20:11:08.290]      </control>
+[20:11:08.290]      // end if-block "canReadPins"
+[20:11:08.290]    </control>
+[20:11:08.290]    <control if="!canReadPins" while="" timeout="0" info="">
+[20:11:08.290]      // if-block "!canReadPins"
+[20:11:08.290]        // =>  FALSE
+[20:11:08.290]      // skip if-block "!canReadPins"
+[20:11:08.290]    </control>
+[20:11:08.290]    <control if="(ACCESS_POINT_VAL & 0x00E00000) == 0" while="" timeout="0" info="">
+[20:11:08.290]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:11:08.290]        // =>  TRUE
+[20:11:08.290]      <block atomic="false" info="">
+[20:11:08.292]        WriteAP(0x00, 0x190008);
+[20:11:08.292]          // -> [WriteAP(0x00000000, 0x00190008)]   (__dp=0x00000000, __ap=0x00000004)
+[20:11:08.292]        WriteAP(0xF0, 0x01);
+[20:11:08.292]          // -> [WriteAP(0x000000F0, 0x00000001)]   (__dp=0x00000000, __ap=0x00000004)
+[20:11:08.292]      </block>
+[20:11:08.293]      // end if-block "(ACCESS_POINT_VAL & 0x00E00000) == 0"
+[20:11:08.293]    </control>
+[20:11:08.293]    <control if="(ACCESS_POINT_VAL & 0x00E00000) != 0" while="" timeout="0" info="">
+[20:11:08.293]      // if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:11:08.293]        // =>  FALSE
+[20:11:08.293]      // skip if-block "(ACCESS_POINT_VAL & 0x00E00000) != 0"
+[20:11:08.293]    </control>
+[20:11:08.293]    <block atomic="false" info="">
+[20:11:08.293]      ACCESS_POINT_VAL = ReadAP(0x00);//Reading current state of access point
+[20:11:08.294]        // -> [ReadAP(0x00000000) => 0x0079002F]   (__dp=0x00000000, __ap=0x00000004)
+[20:11:08.294]        // -> [ACCESS_POINT_VAL <= 0x0079002F]
+[20:11:08.294]      Message(0, "Current state of access point is: %x",ACCESS_POINT_VAL);
+[20:11:08.295]      __ap = 0; //lets make sure we reset the access point selection
+[20:11:08.295]        // -> [__ap <= 0x00000000]
+[20:11:08.295]    </block>
+[20:11:08.296]  </sequence>
+[20:11:08.296]  
+[20:11:08.297]  **********  Sequence "DebugDeviceUnlock"  (Context="Connect", Pname="", info="")
+[20:11:08.297]  
+[20:11:08.297]  <debugvars>
+[20:11:08.297]    // Pre-defined
+[20:11:08.297]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[20:11:08.297]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[20:11:08.297]    __dp=0x00000000
+[20:11:08.298]    __ap=0x00000000
+[20:11:08.298]    __traceout=0x00000000      (Trace Disabled)
+[20:11:08.298]    __errorcontrol=0x00000000  (Skip Errors="False")
+[20:11:08.298]    __FlashAddr=0x00000000
+[20:11:08.298]    __FlashLen=0x00000000
+[20:11:08.298]    __FlashArg=0x00000000
+[20:11:08.298]    __FlashOp=0x00000000
+[20:11:08.298]    __Result=0x00000000
+[20:11:08.298]  </debugvars>
+[20:11:08.298]  
+[20:11:08.298]  <sequence name="DebugDeviceUnlock" Pname="" disable="false" info="">
+[20:11:08.299]    <block atomic="false" info="">
+[20:11:08.299]      __var deviceID = 0;
+[20:11:08.299]        // -> [deviceID <= 0x00000000]
+[20:11:08.299]      __var version = 0;
+[20:11:08.300]        // -> [version <= 0x00000000]
+[20:11:08.300]      __var partNum = 0;
+[20:11:08.300]        // -> [partNum <= 0x00000000]
+[20:11:08.300]      __var manuf = 0;
+[20:11:08.300]        // -> [manuf <= 0x00000000]
+[20:11:08.300]      __var isMSPM0G1X0X_G3X0X = 0;
+[20:11:08.300]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000000]
+[20:11:08.300]      __var isProduction = 0;
+[20:11:08.300]        // -> [isProduction <= 0x00000000]
+[20:11:08.301]      __var continueId = 0;
+[20:11:08.301]        // -> [continueId <= 0x00000000]
+[20:11:08.301]      deviceID =   Read32(0x41C40004);
+[20:11:08.301]        // -> [Read32(0x41C40004) => 0x2BB8802F]   (__dp=0x00000000, __ap=0x00000000)
+[20:11:08.302]        // -> [deviceID <= 0x2BB8802F]
+[20:11:08.302]      version = deviceID >> 28;
+[20:11:08.302]        // -> [version <= 0x00000002]
+[20:11:08.302]      partNum = (deviceID & 0x0FFFF000) >> 12;
+[20:11:08.302]        // -> [partNum <= 0x0000BB88]
+[20:11:08.302]      manuf = (deviceID & 0x00000FFE) >> 1;
+[20:11:08.302]        // -> [manuf <= 0x00000017]
+[20:11:08.302]      isMSPM0G1X0X_G3X0X = (partNum == 0xBB88) && (manuf == 0x17);
+[20:11:08.302]        // -> [isMSPM0G1X0X_G3X0X <= 0x00000001]
+[20:11:08.303]      isProduction = (version > 0);
+[20:11:08.303]        // -> [isProduction <= 0x00000001]
+[20:11:08.303]    </block>
+[20:11:08.303]    <control if="!isMSPM0G1X0X_G3X0X" while="" timeout="0" info="">
+[20:11:08.303]      // if-block "!isMSPM0G1X0X_G3X0X"
+[20:11:08.303]        // =>  FALSE
+[20:11:08.303]      // skip if-block "!isMSPM0G1X0X_G3X0X"
+[20:11:08.303]    </control>
+[20:11:08.303]    <control if="continueId == 4" while="" timeout="0" info="">
+[20:11:08.304]      // if-block "continueId == 4"
+[20:11:08.304]        // =>  FALSE
+[20:11:08.304]      // skip if-block "continueId == 4"
+[20:11:08.304]    </control>
+[20:11:08.304]    <control if="!isProduction" while="" timeout="0" info="">
+[20:11:08.304]      // if-block "!isProduction"
+[20:11:08.304]        // =>  FALSE
+[20:11:08.304]      // skip if-block "!isProduction"
+[20:11:08.304]    </control>
+[20:11:08.304]  </sequence>
+[20:11:08.304]  

@@ -1,0 +1,7 @@
+Load "c:\\Users\\McGRADY\\Documents\\Work_Space\\Electronics Design Contest-26-07\\mspm0g3507\\project\\mdk\\Objects\\SeekFree_MSPM0G3507_Device_Library.axf" 
+Info: Debug/System power-up request sent 
+Info: executing SWD power up 
+Info: Current state of access point is: 80027 
+Info: Current state of access point is: 79002f 
+Erase Done.Programming Done.Verify OK.Application running ...
+Flash Load finished at 22:38:57

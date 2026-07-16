@@ -1,0 +1,21 @@
+{
+    // 关闭微软 C/C++ 插件的 IntelliSense，避免与 clangd 抢占「跳转/补全」
+    // （调试功能仍保留，只是不再由 cpptools 提供代码导航）
+    "C_Cpp.intelliSenseEngine": "disabled",
+
+    // clangd 启动参数
+    "clangd.arguments": [
+        "--background-index",          // 后台建立全项目索引，跳转更准
+        "--all-scopes-completion",     // 允许补全未包含头文件中的符号
+        "--completion-style=detailed",
+        "--header-insertion=never",    // 不自动插入 #include
+        "--pch-storage=memory",
+        "-j=4"                          // 索引并发线程数
+    ],
+
+    // 关联嵌入式常见文件类型
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c"
+    }
+}

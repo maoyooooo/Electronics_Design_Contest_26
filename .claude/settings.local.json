@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -vi \"//\")",
+      "Bash(awk '/^void DL_Timer_configQEI\\\\\\(/,/^}/' libraries/sdk/ti/driverlib/dl_timer.c)",
+      "Bash(sed -n '/float PID_Calculate\\(pid_t/,/^}/p' project/code/motor.c)",
+      "Bash(sed -n '/void PID_Limit/,/^}/p' project/code/motor.c)",
+      "Bash(sed -n '/void Motor_Init/,/^}/p' project/code/motor.c)"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+CompileFlags:
+  Add:
+    # ================= 项目代码 =================
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/project/code
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/project/user/inc
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/project/user/src
+    # ================= 逐飞库 =================
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/zf_common
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/zf_components
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/zf_device
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/zf_driver
+    # ================= TI MSPM0 SDK =================
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti_config
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/driverlib
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/driverlib/m0p
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/driverlib/m0p/sysctl
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/devices/msp
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/devices/msp/m0p
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/devices/msp/peripherals
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/ti/devices/msp/peripherals/m0p
+    # ================= CMSIS =================
+    - -Ic:/Users/McGRADY/Documents/Work_Space/Electronics Design Contest-26-07/mspm0g3507/libraries/sdk/third_party/CMSIS/Core/Include
+    # ================= 目标架构（关键）=================
+    # 让 clangd 按 ARM Cortex-M0+ 交叉编译方式解析，
+    # 否则 CMSIS 里的内联汇编/内建函数会在 x86 主机模式下大量报错。
+    - --target=arm-none-eabi
+    - -mcpu=cortex-m0plus
+    - -mthumb
+    - -mfloat-abi=soft
+    # 解除「报错满 20 条就停止解析」的限制，保证整份文件都被索引（跳转才完整）
+    - -ferror-limit=0
+    # ================= 目标宏定义 =================
+    - -D__MSPM0G3507__
+    # 说明：clangd 不支持 ${workspaceFolder} 变量，且无 compile_commands.json 时
+    # 相对路径会相对「每个源文件目录」解析而失效，所以这里必须用绝对路径。
+    # 若挪动工程，请把上面所有 -I 后的绝对路径统一替换为新位置。
+
+# 隐藏交叉编译产生的无关波浪线（不影响跳转/补全；想看诊断可改回或删除本段）
+Diagnostics:
+  Suppress: '*'
+  UnusedIncludes: None
+  MissingIncludes: None
