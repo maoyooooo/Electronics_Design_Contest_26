@@ -42,7 +42,7 @@
 static void motor(uint32 state, void *ptr)
 {
     (void)state; (void)ptr;         
-    Motor_SpeedLoop(300.0f, 300.0f);       
+    Motor_UpdateRpmFromEncoder();
     
 }
 
@@ -55,25 +55,25 @@ static void imu_get(uint32 state, void *ptr)
 
 }
 
-
 int main (void)
 {
     clock_init(SYSTEM_CLOCK_80M);   // 时钟配置及系统初始化<务必保留>
     debug_init();					// 调试串口信息初始化
+    wireless_uart_init();              // 无线串口初始化
 	// 此处编写用户代码 例如外设初始化代码等
-    // ips200_init(IPS200_TYPE_SPI);
     //Motor_Init();
     //encoder_init();
-    imu660rb_init();
-    gyroOffset_init();
-    pit_ms_init(PIT_TIM_G0, 5, imu_get, NULL); // 5ms周期获取IMU数据
-    //pit_ms_init(PIT_TIM_G0, 10, motor, NULL); // 10ms周期测量电机速度
+    //imu660rb_init();
+    //gyroOffset_init();
+    //pit_ms_init(PIT_TIM_G0, 5, imu_get, NULL); // 5ms周期获取IMU数据
+    //pit_ms_init(PIT_TIM_G6, 10, motor, NULL); // 10ms周期测量电机速度
+    Grayscale_Init();
     // 此处编写用户代码 例如外设初始化代码等
     while(true)
     {
         // 此处编写需要循环执行的代码
-        printf("angle_Z:%.2f \n", angle_Z);
+        Grayscale_PrintRawAverage("RAW");
+        system_delay_ms(1000);
         // 此处编写需要循环执行的代码
     }
 }
-

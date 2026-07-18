@@ -419,6 +419,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\kalman.h</FilePath>
             </File>
+            <File>
+              <FileName>Grayscale_Sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Grayscale_Sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Grayscale_Sensor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Grayscale_Sensor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

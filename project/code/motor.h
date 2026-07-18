@@ -29,8 +29,8 @@ typedef struct pid_t
   uint32_t PID_Limit_MAX; 	//最大输出限幅
   uint32_t Ki_Limit_MAX;	//最大积分输出限幅
 }pid_t;
-float PID_Calculate(pid_t *pid,float Measure,  float Target);
-float PID_Calculate_Angle(pid_t *pid,float Measure,  float Target);
+float PID_Calculate(pid_t *pid, float Target, float Measure);
+float PID_Calculate_Angle(pid_t *pid, float Measure, float Target);
 void Set_PID_Param(pid_t *pid, float P, float I,float D);
 /*-------------------------------------------------------------------------------------------*/
 /*------------------------------------电机操作函数-------------------------------------------*/
@@ -45,6 +45,20 @@ void Set_PID_Param(pid_t *pid, float P, float I,float D);
 // 电机占空比上限（防越界，必须 <= 逐飞库 PWM_DUTY_MAX=10000）
 // 台架首次测试建议先设小一点（如 5000=50%）更安全，稳定后再调大到 10000
 #define MOTOR_DUTY_MAX           (10000)
+
+// 相对角转向参数（需要根据底盘惯量和电机静摩擦做实车微调）
+#define TURN_CONTROL_PERIOD_MS       (10U)
+#define TURN_TIMEOUT_MS              (8000U)
+#define TURN_ANGLE_TOLERANCE_DEG     (2.0f)
+#define TURN_SETTLE_SAMPLE_COUNT     (5U)
+#define TURN_MIN_SPEED_MM_S          (80.0f)
+#define TURN_MAX_SPEED_MM_S          (300.0f)
+#define TURN_MAX_RELATIVE_ANGLE_DEG  (3600.0f)
+
+// 若 Set_Motor_PWM(+,-) 使 angle_Z 增大则保持 +1；反之改为 -1。
+#ifndef TURN_YAW_DIRECTION_SIGN
+#define TURN_YAW_DIRECTION_SIGN      (1.0f)
+#endif
 
 
 
@@ -64,12 +78,17 @@ extern uint8_t Distance_PID_Flag;
 extern uint8_t Gyro_PID_Flag;
 extern uint8_t Angle_PID_Flag;
 
-extern float current_L_speed;
-extern float current_R_speed;
+extern volatile float current_L_speed;
+extern volatile float current_R_speed;
 
 // ---函数原型声明---
 void Motor_Init(void);
 void Motor_Control_Loop(float target_L, float target_R);
+void Motor_UpdateRpmFromEncoder(void);
 void Motor_SpeedLoop(float target_L_speed, float target_R_speed);
+
+// 仅从主循环/普通函数调用；IMU 角度更新中断必须保持运行。
+// relative_angle > 0 表示 angle_Z 正方向，返回 true 表示到位，false 表示输入异常或超时。
+bool Turn_Control(float relative_angle);
 
 #endif

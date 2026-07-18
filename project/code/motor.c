@@ -1,7 +1,8 @@
 #include "zf_common_headfile.h"
+#include <math.h>
 
-float current_L_speed = 0.0f;
-float current_R_speed = 0.0f;
+volatile float current_L_speed = 0.0f;
+volatile float current_R_speed = 0.0f;
 #define speed_FILTER_ALPHA 0.3f
 
 /**
@@ -123,7 +124,7 @@ void PID_Limit(float *a, float ABS_MAX){
 *
 *	函数功能:	PID计算公式
 *
-*   参    数：  PID结构体，当前值，目标值
+*   参    数：  PID结构体，目标值，当前测量值
 *************************************************************************************************/
 float PID_Calculate(pid_t *pid, float Target, float Measure)
 {
@@ -202,7 +203,7 @@ void Set_Motor_PWM(float out_L, float out_R)
     pwm_set_duty(MOTOR2_PWM, duty_r);
 }
 
-static void Motor_UpdateRpmFromEncoder(void)
+void Motor_UpdateRpmFromEncoder(void)
 {
     MEASURE_MOTORS_SPEED();
 
@@ -212,11 +213,108 @@ static void Motor_UpdateRpmFromEncoder(void)
 
 void Motor_SpeedLoop(float target_L_speed, float target_R_speed)
 {
-
-	Motor_UpdateRpmFromEncoder();
     float out_l = PID_Calculate(&pid_Motor1_Speed, target_L_speed, current_L_speed);
     float out_r = PID_Calculate(&pid_Motor2_Speed, target_R_speed, current_R_speed);
     Set_Motor_PWM(out_l, out_r);
 }
 
+static void PID_ResetState(pid_t *pid, float initial_error)
+{
+	pid->Target = 0.0f;
+	pid->Measure = 0.0f;
+	pid->Error[0] = initial_error;
+	pid->Error[1] = initial_error;
+	pid->Error[2] = initial_error;
+	pid->KpOut = 0.0f;
+	pid->KiOut = 0.0f;
+	pid->KdOut = 0.0f;
+	pid->PID_Out = 0.0f;
+}
 
+static float Turn_LimitSpeed(float target_speed, float error)
+{
+	PID_Limit(&target_speed, TURN_MAX_SPEED_MM_S);
+
+	if ((error > TURN_ANGLE_TOLERANCE_DEG) &&
+		(target_speed > 0.0f) && (target_speed < TURN_MIN_SPEED_MM_S))
+	{
+		return TURN_MIN_SPEED_MM_S;
+	}
+
+	if ((error < -TURN_ANGLE_TOLERANCE_DEG) &&
+		(target_speed < 0.0f) && (target_speed > -TURN_MIN_SPEED_MM_S))
+	{
+		return -TURN_MIN_SPEED_MM_S;
+	}
+
+	return target_speed;
+}
+
+bool Turn_Control(float relative_angle)
+{
+	uint32 elapsed_ms = 0U;
+	uint32 settled_samples = 0U;
+	bool target_reached = false;
+	float current_angle;
+	float target_angle;
+	float error;
+
+	current_angle = angle_Z;
+	if (!isfinite(relative_angle) ||
+		(fabsf(relative_angle) > TURN_MAX_RELATIVE_ANGLE_DEG) ||
+		!isfinite(current_angle))
+	{
+		Set_Motor_PWM(0.0f, 0.0f);
+		return false;
+	}
+
+	target_angle = current_angle + relative_angle;
+	error = target_angle - current_angle;
+
+	PID_ResetState(&pid_Angle, error);
+	PID_ResetState(&pid_Motor1_Speed, 0.0f);
+	PID_ResetState(&pid_Motor2_Speed, 0.0f);
+
+	while (elapsed_ms < TURN_TIMEOUT_MS)
+	{
+		float target_turn_speed;
+
+		current_angle = angle_Z;
+		if (!isfinite(current_angle))
+		{
+			break;
+		}
+		error = target_angle - current_angle;
+
+		if (fabsf(error) <= TURN_ANGLE_TOLERANCE_DEG)
+		{
+			Set_Motor_PWM(0.0f, 0.0f);
+			++settled_samples;
+			if (settled_samples >= TURN_SETTLE_SAMPLE_COUNT)
+			{
+				target_reached = true;
+				break;
+			}
+		}
+		else
+		{
+			float motor_turn_speed;
+
+			settled_samples = 0U;
+			target_turn_speed = PID_Calculate(&pid_Angle, target_angle, current_angle);
+			target_turn_speed = Turn_LimitSpeed(target_turn_speed, error);
+			motor_turn_speed = target_turn_speed * TURN_YAW_DIRECTION_SIGN;
+			Motor_SpeedLoop(motor_turn_speed, -motor_turn_speed);
+		}
+
+		system_delay_ms(TURN_CONTROL_PERIOD_MS);
+		elapsed_ms += TURN_CONTROL_PERIOD_MS;
+	}
+
+	Set_Motor_PWM(0.0f, 0.0f);
+	PID_ResetState(&pid_Angle, 0.0f);
+	PID_ResetState(&pid_Motor1_Speed, 0.0f);
+	PID_ResetState(&pid_Motor2_Speed, 0.0f);
+
+	return target_reached;
+}

@@ -2,6 +2,7 @@
 ".\objects\motor.o"
 ".\objects\encoder.o"
 ".\objects\kalman.o"
+".\objects\grayscale_sensor.o"
 ".\objects\main.o"
 ".\objects\isr.o"
 ".\objects\zf_common_clock.o"

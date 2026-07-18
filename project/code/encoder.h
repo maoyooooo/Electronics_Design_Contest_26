@@ -23,8 +23,8 @@
 /*--------------------------------- 引脚与资源配置（可修改） -------------------------------------------------------*/
 // 左轮：硬件 QEI（注意 A/B 引脚枚举必须都属于 TIMG8）
 #define ENCODER_L_TIMER          (TIM_G8)                        // 左轮使用的定时器（QEI 仅 TIMG8 可用）
-#define ENCODER_L_QEI_A_PIN      (TIMG8_ENCODER1_CH1_B21)        // 左轮 A 相
-#define ENCODER_L_QEI_B_PIN      (TIMG8_ENCODER1_CH2_B22)        // 左轮 B 相
+#define ENCODER_L_QEI_A_PIN      (TIMG8_ENCODER1_CH1_A26)        // 左轮 A 相
+#define ENCODER_L_QEI_B_PIN      (TIMG8_ENCODER1_CH2_A27)        // 左轮 B 相
 
 // 右轮：外部中断软件正交（普通可中断 GPIO 即可）
 #define ENCODER_R_A_PIN          (B17)                           // 右轮 A 相
