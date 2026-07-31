@@ -26,6 +26,8 @@ static uint32 zero_commands_after_resume;
 static uint32 measure_speed_calls;
 static float plant_left_speed;
 static float plant_right_speed;
+static grayscale_status_t grayscale_read_status;
+static grayscale_frame_t grayscale_read_frame;
 
 static void fail(const char *message)
 {
@@ -93,6 +95,12 @@ void MEASURE_MOTORS_SPEED(void)
     Motor1_Speed = plant_left_speed;
     Motor2_Speed = plant_right_speed;
     ++measure_speed_calls;
+}
+
+grayscale_status_t Grayscale_Read(grayscale_frame_t *frame)
+{
+    *frame = grayscale_read_frame;
+    return grayscale_read_status;
 }
 
 void system_delay_ms(uint32 time)
@@ -174,10 +182,329 @@ static void reset_fixture(float initial_angle)
     gpio_levels[MOTOR2_DIR] = GPIO_HIGH;
     pwm_duties[MOTOR1_PWM] = 0;
     pwm_duties[MOTOR2_PWM] = 0;
+    grayscale_read_status = GRAYSCALE_STATUS_OK;
+    grayscale_read_frame = (grayscale_frame_t){0};
+    grayscale_read_frame.line_detected = true;
     Set_PID_Param(&pid_Turn, 0.0f, 0.0f, 0.0f);
     Set_PID_Param(&pid_Angle, 3.1f, 0.0f, 0.0f);
     Set_PID_Param(&pid_Motor1_Speed, 17.0f, 0.0f, 0.0f);
     Set_PID_Param(&pid_Motor2_Speed, 17.0f, 0.0f, 0.0f);
+    Line_Follow_ResetState();
+}
+
+static void test_line_follow_speed_planning(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+
+    grayscale_read_frame.deviation = 0.0f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target - LINE_BASE_SPEED_MM_S) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target - LINE_BASE_SPEED_MM_S) > 0.001f)
+    {
+        fail("centered line must keep the normal base speed");
+    }
+
+    grayscale_read_frame.deviation = 1.0f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target -
+              (LINE_BASE_SPEED_MM_S - LINE_SPEED_CURVE_GAIN_MM_S)) >
+            0.001f ||
+        fabsf(pid_Motor2_Speed.Target -
+              (LINE_BASE_SPEED_MM_S - LINE_SPEED_CURVE_GAIN_MM_S)) >
+            0.001f)
+    {
+        fail("small deviation did not use the quadratic speed curve");
+    }
+
+    grayscale_read_frame.deviation = 3.5f;
+    for (uint8 index = 0U; index < 5U; ++index)
+    {
+        Line_Follow_Control();
+    }
+    if (fabsf(pid_Motor1_Speed.Target - LINE_MIN_SPEED_MM_S) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target - LINE_MIN_SPEED_MM_S) > 0.001f)
+    {
+        fail("edge deviation did not reach the minimum base speed");
+    }
+
+    grayscale_read_frame.deviation = 0.0f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target -
+              (LINE_MIN_SPEED_MM_S + LINE_SPEED_ACCEL_STEP_MM_S)) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target -
+              (LINE_MIN_SPEED_MM_S + LINE_SPEED_ACCEL_STEP_MM_S)) > 0.001f)
+    {
+        fail("base speed did not recover gradually after an acute turn");
+    }
+}
+
+static void test_line_follow_uses_configured_base_speed(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+
+    if (!Line_Follow_SetBaseSpeed(200.0f))
+    {
+        fail("valid configured line-follow speed was rejected");
+    }
+
+    grayscale_read_frame.deviation = 0.0f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target - 200.0f) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target - 200.0f) > 0.001f)
+    {
+        fail("configured line-follow speed did not control straight speed");
+    }
+}
+
+static void test_line_follow_speed_planning_preserves_turn_direction(void)
+{
+    const float boost_at_deviation_2 =
+        1.0f + (LINE_TURN_BOOST_MAX - 1.0f) *
+        (2.0f - LINE_TURN_BOOST_START_DEVIATION) /
+        (LINE_TURN_BOOST_FULL_DEVIATION -
+         LINE_TURN_BOOST_START_DEVIATION);
+    const float expected_differential = 160.0f * boost_at_deviation_2;
+
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Turn, 40.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_frame.deviation = 2.0f;
+
+    Line_Follow_Control();
+    if (fabsf((pid_Motor1_Speed.Target - pid_Motor2_Speed.Target) -
+              expected_differential) > 0.001f)
+    {
+        fail("right-side acute turn did not apply the differential boost");
+    }
+
+    grayscale_read_frame.deviation = -2.0f;
+    Line_Follow_Control();
+    if (fabsf((pid_Motor2_Speed.Target - pid_Motor1_Speed.Target) -
+              expected_differential) > 0.001f)
+    {
+        fail("left-side acute turn did not apply the differential boost");
+    }
+}
+
+static void test_line_follow_speed_planning_prevents_inner_wheel_reverse(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Turn, 100.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_frame.deviation = 3.5f;
+
+    for (uint8 index = 0U; index < 6U; ++index)
+    {
+        Line_Follow_Control();
+    }
+    if (fabsf(pid_Motor1_Speed.Target -
+              (2.0f * LINE_MIN_SPEED_MM_S)) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target - LINE_MIN_WHEEL_SPEED_MM_S) > 0.001f)
+    {
+        fail("large correction must stop, not reverse, the inner wheel");
+    }
+
+    grayscale_read_frame.deviation = -3.5f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target - LINE_MIN_WHEEL_SPEED_MM_S) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target -
+              (2.0f * LINE_MIN_SPEED_MM_S)) > 0.001f)
+    {
+        fail("left-edge correction must stop, not reverse, the inner wheel");
+    }
+}
+
+static void test_line_follow_recovery_turns_toward_last_edge(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_frame.deviation = LINE_RECOVERY_ARM_DEVIATION;
+    Line_Follow_Control();
+
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target -
+              (LINE_RECOVERY_BASE_SPEED_MM_S +
+               LINE_RECOVERY_CORRECTION_MM_S)) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target -
+              (LINE_RECOVERY_BASE_SPEED_MM_S -
+               LINE_RECOVERY_CORRECTION_MM_S)) > 0.001f)
+    {
+        fail("right-edge loss did not continue turning right");
+    }
+
+    grayscale_read_status = GRAYSCALE_STATUS_OK;
+    grayscale_read_frame.line_detected = true;
+    grayscale_read_frame.deviation = 0.0f;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target - pid_Motor2_Speed.Target) > 0.001f)
+    {
+        fail("line reacquisition did not return to normal tracking");
+    }
+
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+    Line_Follow_Control();
+    if (pid_Motor1_Speed.Target != 0.0f || pid_Motor2_Speed.Target != 0.0f)
+    {
+        fail("reacquired centered line did not clear the old recovery direction");
+    }
+
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_frame.deviation = -LINE_RECOVERY_ARM_DEVIATION;
+    Line_Follow_Control();
+
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+    Line_Follow_Control();
+    if (fabsf(pid_Motor1_Speed.Target -
+              (LINE_RECOVERY_BASE_SPEED_MM_S -
+               LINE_RECOVERY_CORRECTION_MM_S)) > 0.001f ||
+        fabsf(pid_Motor2_Speed.Target -
+              (LINE_RECOVERY_BASE_SPEED_MM_S +
+               LINE_RECOVERY_CORRECTION_MM_S)) > 0.001f)
+    {
+        fail("left-edge loss did not continue turning left");
+    }
+}
+
+static void test_line_follow_recovery_times_out_and_unarmed_loss_stops(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+    Line_Follow_Control();
+    if (pid_Motor1_Speed.Target != 0.0f || pid_Motor2_Speed.Target != 0.0f)
+    {
+        fail("unarmed line loss must stop the motors");
+    }
+
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_frame.deviation = LINE_RECOVERY_ARM_DEVIATION;
+    Line_Follow_Control();
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+
+    for (uint8 index = 0U;
+         index < LINE_RECOVERY_MAX_LOST_CYCLES;
+         ++index)
+    {
+        Line_Follow_Control();
+    }
+    if (pid_Motor1_Speed.Target == 0.0f && pid_Motor2_Speed.Target == 0.0f)
+    {
+        fail("recovery stopped before its configured timeout");
+    }
+
+    Line_Follow_Control();
+    if (pid_Motor1_Speed.Target != 0.0f || pid_Motor2_Speed.Target != 0.0f)
+    {
+        fail("recovery timeout must stop the motors");
+    }
+}
+
+static void test_line_follow_fault_stop_clears_pid_and_pwm(void)
+{
+    reset_fixture(0.0f);
+    pid_Motor1_Speed.KiOut = 500.0f;
+    pid_Motor2_Speed.KiOut = -500.0f;
+    grayscale_read_status = GRAYSCALE_STATUS_INVALID_CALIBRATION;
+    grayscale_read_frame.line_detected = false;
+
+    Line_Follow_Control();
+    if (pwm_duties[MOTOR1_PWM] != 0U || pwm_duties[MOTOR2_PWM] != 0U ||
+        pid_Motor1_Speed.Target != 0.0f ||
+        pid_Motor2_Speed.Target != 0.0f ||
+        pid_Motor1_Speed.KiOut != 0.0f ||
+        pid_Motor2_Speed.KiOut != 0.0f)
+    {
+        fail("line-follow fault stop did not clear PWM and speed PID state");
+    }
+}
+
+static void test_motor_stop_clears_speed_pid_and_pwm(void)
+{
+    reset_fixture(0.0f);
+    pid_Motor1_Speed.Target = 250.0f;
+    pid_Motor2_Speed.Target = 250.0f;
+    pid_Motor1_Speed.KiOut = 500.0f;
+    pid_Motor2_Speed.KiOut = -500.0f;
+    pwm_duties[MOTOR1_PWM] = 1000U;
+    pwm_duties[MOTOR2_PWM] = 1000U;
+
+    Motor_Stop();
+
+    if (pwm_duties[MOTOR1_PWM] != 0U ||
+        pwm_duties[MOTOR2_PWM] != 0U ||
+        pid_Motor1_Speed.Target != 0.0f ||
+        pid_Motor2_Speed.Target != 0.0f ||
+        pid_Motor1_Speed.KiOut != 0.0f ||
+        pid_Motor2_Speed.KiOut != 0.0f)
+    {
+        fail("motor stop did not clear PWM and speed PID state");
+    }
+}
+
+static void test_line_follow_stops_when_line_is_lost(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+    grayscale_read_status = GRAYSCALE_STATUS_LINE_LOST;
+    grayscale_read_frame.line_detected = false;
+
+    Line_Follow_Control();
+    if (pid_Motor1_Speed.Target != 0.0f || pid_Motor2_Speed.Target != 0.0f)
+    {
+        fail("lost line must retain the stop command");
+    }
+}
+
+static void set_strong_single_side_frame(int direction)
+{
+    uint8 channel;
+
+    grayscale_read_status = GRAYSCALE_STATUS_OK;
+    grayscale_read_frame = (grayscale_frame_t){0};
+    grayscale_read_frame.line_detected = true;
+    grayscale_read_frame.deviation = (direction > 0) ? 2.0f : -2.0f;
+
+    for (channel = 0U; channel < 4U; ++channel)
+    {
+        grayscale_read_frame.strength[(direction > 0) ?
+                                      (uint8)(channel + 4U) : channel] = 700U;
+    }
+}
+
+static void test_strong_single_side_frame_keeps_normal_tracking(void)
+{
+    reset_fixture(0.0f);
+    Set_PID_Param(&pid_Turn, 40.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor1_Speed, 0.0f, 0.0f, 0.0f);
+    Set_PID_Param(&pid_Motor2_Speed, 0.0f, 0.0f, 0.0f);
+
+    set_strong_single_side_frame(1);
+    Line_Follow_Control();
+    Line_Follow_Control();
+
+    if (fabsf(pid_Motor1_Speed.Target - pid_Motor2_Speed.Target) < 0.001f)
+    {
+        fail("strong single-side frame must not replace normal differential tracking");
+    }
 }
 
 static void expect_stopped(void)
@@ -386,6 +713,55 @@ static void test_invalid_angle_source_fails_immediately(void)
     expect_stopped();
 }
 
+static void test_turn_restores_the_previously_selected_speed_pid_profile(void)
+{
+    reset_fixture(0.0f);
+
+    if (!Motor_SpeedPid_SelectProfile(MOTOR_SPEED_PID_PROFILE_QUESTION4))
+    {
+        fail("question 4 speed PID profile was rejected before turn test");
+    }
+    pid_Question4_Motor1_Speed.Target = 123.0f;
+    pid_Question4_Motor2_Speed.Target = 124.0f;
+    pid_Question4_Motor1_Speed.KiOut = 17.0f;
+    pid_Question4_Motor2_Speed.KiOut = 18.0f;
+
+    if (!Turn_Control(45.0f))
+    {
+        fail("turn with a saved question PID profile unexpectedly timed out");
+    }
+    if (Motor_SpeedPid_GetActiveProfile() != MOTOR_SPEED_PID_PROFILE_QUESTION4)
+    {
+        fail("turn did not restore the previously selected speed PID profile");
+    }
+    if (fabsf(pid_Question4_Motor1_Speed.Target - 123.0f) > 0.001f ||
+        fabsf(pid_Question4_Motor2_Speed.Target - 124.0f) > 0.001f ||
+        fabsf(pid_Question4_Motor1_Speed.KiOut - 17.0f) > 0.001f ||
+        fabsf(pid_Question4_Motor2_Speed.KiOut - 18.0f) > 0.001f)
+    {
+        fail("turn control modified the saved question speed PID state");
+    }
+    if (pid_Motor1_Speed.Target != 0.0f || pid_Motor2_Speed.Target != 0.0f)
+    {
+        fail("turn control did not reset its default speed PID state");
+    }
+}
+
+static void test_invalid_turn_keeps_the_selected_speed_pid_profile(void)
+{
+    reset_fixture(0.0f);
+    Motor_SpeedPid_SelectProfile(MOTOR_SPEED_PID_PROFILE_QUESTION5);
+
+    if (Turn_Control(NAN))
+    {
+        fail("invalid turn input unexpectedly reported success");
+    }
+    if (Motor_SpeedPid_GetActiveProfile() != MOTOR_SPEED_PID_PROFILE_QUESTION5)
+    {
+        fail("invalid turn input changed the selected speed PID profile");
+    }
+}
+
 int main(void)
 {
     Motor_Init();
@@ -400,6 +776,18 @@ int main(void)
     test_angle_source_failure_during_turn_stops();
     test_inertia_can_reset_the_settle_window();
     test_invalid_angle_source_fails_immediately();
+    test_line_follow_speed_planning();
+    test_line_follow_uses_configured_base_speed();
+    test_line_follow_speed_planning_preserves_turn_direction();
+    test_line_follow_speed_planning_prevents_inner_wheel_reverse();
+    test_line_follow_stops_when_line_is_lost();
+    test_line_follow_recovery_turns_toward_last_edge();
+    test_line_follow_recovery_times_out_and_unarmed_loss_stops();
+    test_line_follow_fault_stop_clears_pid_and_pwm();
+    test_motor_stop_clears_speed_pid_and_pwm();
+    test_strong_single_side_frame_keeps_normal_tracking();
+    test_invalid_turn_keeps_the_selected_speed_pid_profile();
+    test_turn_restores_the_previously_selected_speed_pid_profile();
     puts("PASS: Turn_Control host tests");
     return EXIT_SUCCESS;
 }

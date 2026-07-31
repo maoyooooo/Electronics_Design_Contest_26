@@ -40,6 +40,9 @@ static volatile int32_t encoder_r_pulse = 0;    // 右轮脉冲累加值（ISR �
 static uint8_t          encoder_r_state = 0;    // 右轮上一次的 (A<<1)|B 状态
 
 // 右轮 A/B 相中断回调（A、B 两个引脚共用此回调，双边沿都会触发）
+static volatile int32_t encoder_l_distance_count = 0;
+static volatile int32_t encoder_r_distance_count = 0;
+
 static void encoder_r_exti_handler(uint32 event, void *ptr)
 {
     (void)event;
@@ -69,6 +72,8 @@ void encoder_init(void)
     // 记录右轮初始状态，清零累加值
     encoder_r_state = (uint8_t)((gpio_get_level(ENCODER_R_A_PIN) << 1) | gpio_get_level(ENCODER_R_B_PIN));
     encoder_r_pulse = 0;
+    encoder_l_distance_count = 0;
+    encoder_r_distance_count = 0;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------
@@ -120,6 +125,9 @@ void MEASURE_MOTORS_SPEED(void)
     Motor1_Get_Speed();
     Motor2_Get_Speed();
 
+    encoder_l_distance_count += Motor1_Encoder_Value;
+    encoder_r_distance_count += Motor2_Encoder_Value;
+
     Motor1_Lucheng += Motor1_Speed * SAMPLE_TIME;   // 路程累计
     Motor2_Lucheng += Motor2_Speed * SAMPLE_TIME;   // 路程累计
     Measure_Distance = Motor1_Lucheng / 2.0f + Motor2_Lucheng / 2.0f;
@@ -128,18 +136,42 @@ void MEASURE_MOTORS_SPEED(void)
     dist_tracker.segment_distance = Measure_Distance - dist_tracker.segment_start_distance;
 
     // 防止长时间运行后浮点数累积过大
-    if (Measure_Distance > 10000)
-    {
-        Measure_Distance = 0;
-        Motor1_Lucheng = 0;
-        Motor2_Lucheng = 0;
-        dist_tracker.segment_start_distance = 0;
-    }
 }
 
 /*--------------------------------------------------------------------------------------------------------------------
  *  重置分段路程起点（状态机切换阶段时调用）
  *------------------------------------------------------------------------------------------------------------------*/
+bool encoder_get_distance(encoder_distance_t *distance)
+{
+    int32_t left_count;
+    int32_t right_count;
+    uint32 primask;
+
+    if (distance == NULL)
+    {
+        return false;
+    }
+
+    primask = interrupt_global_disable();
+    left_count = encoder_l_distance_count;
+    right_count = encoder_r_distance_count;
+    interrupt_global_enable(primask);
+
+    distance->left_mm = (float)left_count * ENCODER_MM_PER_COUNT;
+    distance->right_mm = (float)right_count * ENCODER_MM_PER_COUNT;
+    return true;
+}
+
+void encoder_reset_distance(void)
+{
+    uint32 primask = interrupt_global_disable();
+
+    encoder_l_distance_count = 0;
+    encoder_r_distance_count = 0;
+
+    interrupt_global_enable(primask);
+}
+
 void Reset_Segment_Distance(void)
 {
     dist_tracker.segment_start_distance = Measure_Distance;

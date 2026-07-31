@@ -1,5 +1,10 @@
 --cpu Cortex-M0+
 ".\objects\motor.o"
+".\objects\question2.o"
+".\objects\question4.o"
+".\objects\question5.o"
+".\objects\question6.o"
+".\objects\menu.o"
 ".\objects\encoder.o"
 ".\objects\kalman.o"
 ".\objects\grayscale_sensor.o"

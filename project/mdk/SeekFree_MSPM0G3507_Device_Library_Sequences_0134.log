@@ -1,0 +1,88 @@
+/*
+ *  CMSIS Pack Debug Access Sequence Log
+ *  File        : c:\Users\McGRADY\Documents\Work_Space\Electronics Design Contest-26-07\mspm0g3507\project\mdk\SeekFree_MSPM0G3507_Device_Library_Sequences_0134.log
+ *  Created     : 16:09:40 (22/07/2026)
+ *  Device      : MSPM0G3507
+ *  PDSC File   : C:/Users/McGRADY/AppData/Local/Arm/Packs/TexasInstruments/MSPM0G1X0X_G3X0X_DFP/1.3.1/TexasInstruments.MSPM0G1X0X_G3X0X_DFP.pdsc
+ *
+ */
+
+[16:09:40.617]  **********  Sequence "DebugPortSetup"  (Context="Connect", Pname="", info="")
+[16:09:40.617]  
+[16:09:40.617]  <debugvars>
+[16:09:40.617]    // Pre-defined
+[16:09:40.618]    __protocol=0x00010002      (Protocol="SWD", SWJ-DP="True")
+[16:09:40.618]    __connection=0x00000202    (Connection Type="Flash", Reset Type="System Reset")
+[16:09:40.618]    __dp=0x00000000
+[16:09:40.618]    __ap=0x00000000
+[16:09:40.618]    __traceout=0x00000000      (Trace Disabled)
+[16:09:40.618]    __errorcontrol=0x00000000  (Skip Errors="False")
+[16:09:40.618]    __FlashAddr=0x00000000
+[16:09:40.619]    __FlashLen=0x00000000
+[16:09:40.619]    __FlashArg=0x00000000
+[16:09:40.619]    __FlashOp=0x00000000
+[16:09:40.619]    __Result=0x00000000
+[16:09:40.619]  </debugvars>
+[16:09:40.619]  
+[16:09:40.620]  <sequence name="DebugPortSetup" Pname="" disable="false" info="">
+[16:09:40.620]    <block atomic="false" info="">
+[16:09:40.620]      __var isSWJ      = ((__protocol & 0x00010000) != 0);
+[16:09:40.620]        // -> [isSWJ <= 0x00000001]
+[16:09:40.620]      __var hasDormant = __protocol & 0x00020000;
+[16:09:40.620]        // -> [hasDormant <= 0x00000000]
+[16:09:40.621]      __var protType   = __protocol & 0x0000FFFF;
+[16:09:40.621]        // -> [protType <= 0x00000002]
+[16:09:40.621]    </block>
+[16:09:40.621]    <control if="protType == 1" while="" timeout="0" info="">
+[16:09:40.621]      // if-block "protType == 1"
+[16:09:40.621]        // =>  FALSE
+[16:09:40.621]      // skip if-block "protType == 1"
+[16:09:40.621]    </control>
+[16:09:40.622]    <control if="protType == 2" while="" timeout="0" info="">
+[16:09:40.622]      // if-block "protType == 2"
+[16:09:40.622]        // =>  TRUE
+[16:09:40.622]      <control if="isSWJ" while="" timeout="0" info="">
+[16:09:40.622]        // if-block "isSWJ"
+[16:09:40.622]          // =>  TRUE
+[16:09:40.622]        <control if="hasDormant" while="" timeout="0" info="">
+[16:09:40.623]          // if-block "hasDormant"
+[16:09:40.623]            // =>  FALSE
+[16:09:40.623]          // skip if-block "hasDormant"
+[16:09:40.623]        </control>
+[16:09:40.623]        <control if="!hasDormant" while="" timeout="0" info="">
+[16:09:40.623]          // if-block "!hasDormant"
+[16:09:40.624]            // =>  TRUE
+[16:09:40.624]          <block atomic="false" info="">
+[16:09:40.624]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //lets put the JTAG line in a reset state
+[16:09:40.624]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[16:09:40.625]            DAP_SWJ_Sequence(16,0xE73C); //SWD to JTAG, this is to ensure the state machine is initialized
+[16:09:40.625]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E73C)]
+[16:09:40.625]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF); //Put it back in reset
+[16:09:40.625]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[16:09:40.625]            DAP_SWJ_Sequence(16, 0xE79E); //JTAG to SWD switch
+[16:09:40.626]              // -> [DAP_SWJ_Sequence(16, 0x000000000000E79E)]
+[16:09:40.626]            DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF);  //Ensure the switch is successful 
+[16:09:40.626]              // -> [DAP_SWJ_Sequence(51, 0x0007FFFFFFFFFFFF)]
+[16:09:40.626]            DAP_SWJ_Sequence(7,  0x00); //Give the line some time to initialize
+[16:09:40.627]              // -> [DAP_SWJ_Sequence(7, 0x0000000000000000)]
+[16:09:40.627]          </block>
+[16:09:40.627]          // end if-block "!hasDormant"
+[16:09:40.627]        </control>
+[16:09:40.627]        // end if-block "isSWJ"
+[16:09:40.627]      </control>
+[16:09:40.627]      <control if="!isSWJ" while="" timeout="0" info="">
+[16:09:40.628]        // if-block "!isSWJ"
+[16:09:40.628]          // =>  FALSE
+[16:09:40.628]        // skip if-block "!isSWJ"
+[16:09:40.628]      </control>
+[16:09:40.628]      <block atomic="false" info="">
+[16:09:40.628]        ReadDP(0x0);
+[16:09:40.630]  
+[16:09:40.630]  !!! E310 : Debug access failed - cannot read DP register 0x00
+[16:09:40.630]  
+[16:09:40.631]          // -> [ReadDP(0x00000000) => 0x00000001]   (__dp=0x00000000)
+[16:09:40.631]      </block>
+[16:09:40.631]      // end if-block "protType == 2"
+[16:09:40.631]    </control>
+[16:09:40.631]  </sequence>
+[16:09:40.631]  

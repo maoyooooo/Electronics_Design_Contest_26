@@ -44,6 +44,10 @@
 #define CC              ((float)(ENCODE_LINE * JIANSUBI * BEIPIN) * SAMPLE_TIME)
 
 #define PI              3.1415f
+#define ENCODER_COUNTS_PER_WHEEL_REV ((uint32)(ENCODE_LINE * JIANSUBI * BEIPIN))
+#define ENCODER_WHEEL_CIRCUMFERENCE_MM (PI * RR)
+#define ENCODER_MM_PER_COUNT \
+    (ENCODER_WHEEL_CIRCUMFERENCE_MM / (float)ENCODER_COUNTS_PER_WHEEL_REV)
 #define RR              65.0f       // 车轮直径，单位 mm（速度输出单位 mm/s，路程单位 mm）
 
 /*--------------------------------- 分段路程跟踪结构体 -------------------------------------------------------------*/
@@ -52,6 +56,12 @@ typedef struct
     float segment_start_distance;   // 分段起点时的总路程
     float segment_distance;         // 当前分段已走距离
 } DistanceTracker;
+
+typedef struct
+{
+    float left_mm;
+    float right_mm;
+} encoder_distance_t;
 
 extern volatile DistanceTracker dist_tracker;
 
@@ -81,5 +91,8 @@ void  MEASURE_MOTORS_SPEED  (void);
 
 // 重置分段路程起点（状态机切换阶段时调用）
 void  Reset_Segment_Distance(void);
+
+bool  encoder_get_distance  (encoder_distance_t *distance);
+void  encoder_reset_distance(void);
 
 #endif

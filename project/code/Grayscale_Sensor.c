@@ -10,8 +10,8 @@
  */
 static grayscale_calibration_t grayscale_calibration =
 {
-    {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U},
-    {4095U, 4095U, 4095U, 4095U, 4095U, 4095U, 4095U, 4095U}
+    {136U, 140U, 142U, 143U, 144U, 145U, 144U, 145U},
+    {403U, 398U, 274U, 588U, 496U, 452U, 427U, 208U}
 };
 
 static void Grayscale_SelectChannel(uint8 channel)
@@ -112,8 +112,7 @@ void Grayscale_Init(void)
     gpio_init(GRAYSCALE_S1_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
     gpio_init(GRAYSCALE_S2_PIN, GPO, GPIO_LOW, GPO_PUSH_PULL);
     adc_init(GRAYSCALE_OUT_PIN, GRAYSCALE_ADC_RESOLUTION);
-    DL_ADC12_setSampleTime0(
-        ADC0, GRAYSCALE_ADC_SAMPLE_TIME_CYCLES - 1U);
+    DL_ADC12_setSampleTime0(ADC0, GRAYSCALE_ADC_SAMPLE_TIME_CYCLES - 1U);
 }
 
 grayscale_status_t Grayscale_ReadRaw(

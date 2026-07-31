@@ -395,6 +395,56 @@
               <FilePath>..\code\motor.h</FilePath>
             </File>
             <File>
+              <FileName>Question2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Question2.c</FilePath>
+            </File>
+            <File>
+              <FileName>Question2.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Question2.h</FilePath>
+            </File>
+            <File>
+              <FileName>Question4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Question4.c</FilePath>
+            </File>
+            <File>
+              <FileName>Question4.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Question4.h</FilePath>
+            </File>
+            <File>
+              <FileName>Question5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Question5.c</FilePath>
+            </File>
+            <File>
+              <FileName>Question5.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Question5.h</FilePath>
+            </File>
+            <File>
+              <FileName>Question6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Question6.c</FilePath>
+            </File>
+            <File>
+              <FileName>Question6.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Question6.h</FilePath>
+            </File>
+            <File>
+              <FileName>Menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>Menu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Menu.h</FilePath>
+            </File>
+            <File>
               <FileName>新建文本文档.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\code\新建文本文档.txt</FilePath>
