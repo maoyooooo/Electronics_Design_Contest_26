@@ -3,8 +3,9 @@
 
 #include "Question2.h"
 
-#define QUESTION5_LAP_DISTANCE_MM          (QUESTION2_LAP_DISTANCE_MM)
-#define QUESTION5_TARGET_SPEED_MM_S        (250.0f)
+#define QUESTION5_LAP_DISTANCE_MM          (6250.0f)
+#define QUESTION5_TARGET_SPEED_MM_S        (280.0f)
+#define QUESTION5_SOFT_STOP_MARGIN_MM      (20.0f)
 #define QUESTION5_TIME_TICK_MS             (10U)
 #define QUESTION5_DISPLAY_PERIOD_MS        (100U)
 

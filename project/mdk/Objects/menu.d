@@ -116,4 +116,5 @@
   ..\..\libraries\zf_components\seekfree_assistant_interface.h \
   ..\code\motor.h ..\code\Grayscale_Sensor.h ..\code\kalman.h \
   ..\code\encoder.h ..\code\Menu.h ..\code\Question2.h \
-  ..\code\Question4.h ..\code\Question5.h ..\code\Question6.h
+  ..\code\Question4.h ..\code\Question5.h ..\code\Question6.h \
+  ..\code\Task_Notify.h

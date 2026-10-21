@@ -31,6 +31,7 @@
 
 #include "zf_common_headfile.h"
 #include "Menu.h"
+#include "Task_Notify.h"
 // 打开新的工程或者工程移动了位置务必执行以下操作
 // 第一步 关闭上面所有打开的文件
 // 第二步 project->clean  等待下方进度条走完
@@ -59,9 +60,8 @@ static void imu_get(uint32 state, void *ptr)
 int main (void)
 {
     clock_init(SYSTEM_CLOCK_80M);   // 时钟配置及系统初始化<务必保留>
-    debug_init();					// 调试串口信息初始化
-    wireless_uart_init();              // 无线串口初始化
 	// 此处编写用户代码 例如外设初始化代码等
+    Task_Notify_Init();
     ips200_init(IPS200_TYPE_SPI);
     Motor_Init();
     encoder_init();

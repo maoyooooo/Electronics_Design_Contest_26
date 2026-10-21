@@ -1,9 +1,7 @@
-*** Using Compiler 'V6.23', folder: 'C:\Users\McGRADY\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
-Build target 'SeekFree_MSPM0G3507_Device_Library'
-compiling Question4.c...
-compiling Menu.c...
-linking...
-Program Size: Code=43160 RO-data=4268 RW-data=940 ZI-data=5868  
-FromELF: creating hex file...
-".\Objects\SeekFree_MSPM0G3507_Device_Library.axf" - 0 Error(s), 0 Warning(s).
-Build Time Elapsed:  00:00:02
+Load "c:\\Users\\McGRADY\\Documents\\Work_Space\\Electronics Design Contest-26-07\\mspm0g3507\\project\\mdk\\Objects\\SeekFree_MSPM0G3507_Device_Library.axf" 
+Info: Debug/System power-up request sent 
+Info: executing SWD power up 
+Info: Current state of access point is: 80027 
+Info: Current state of access point is: 79002f 
+Erase Done.Programming Done.Verify OK.Application running ...
+Flash Load finished at 19:01:09

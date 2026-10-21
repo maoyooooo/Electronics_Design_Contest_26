@@ -9,9 +9,14 @@ typedef struct
 {
     float base_speed_mm_s;
     float requested_base_speed_mm_s;
+    float start_accel_mm_s2;
+    float stop_decel_mm_s2;
     float last_edge_deviation;
     uint8 edge_age_cycles;
     uint8 lost_line_cycles;
+    bool soft_motion_enabled;
+    bool startup_ramp_active;
+    bool smooth_stop_requested;
     bool recovery_armed;
 } line_follow_state_t;
 
@@ -423,10 +428,20 @@ void Motor_Stop(void)
     Motor_SpeedPid_ResetActiveProfile();
 }
 
+static void Line_Follow_ResetMotionRamp(void)
+{
+    line_follow_state.start_accel_mm_s2 = 0.0f;
+    line_follow_state.stop_decel_mm_s2 = 0.0f;
+    line_follow_state.soft_motion_enabled = false;
+    line_follow_state.startup_ramp_active = false;
+    line_follow_state.smooth_stop_requested = false;
+}
+
 static void Line_Follow_ResetRuntimeState(void)
 {
     line_follow_state.base_speed_mm_s =
         line_follow_state.requested_base_speed_mm_s;
+    Line_Follow_ResetMotionRamp();
     line_follow_state.last_edge_deviation = 0.0f;
     line_follow_state.edge_age_cycles = 0U;
     line_follow_state.lost_line_cycles = 0U;
@@ -448,7 +463,66 @@ bool Line_Follow_SetBaseSpeed(float base_speed_mm_s)
 
     line_follow_state.requested_base_speed_mm_s = base_speed_mm_s;
     line_follow_state.base_speed_mm_s = base_speed_mm_s;
+    Line_Follow_ResetMotionRamp();
     return true;
+}
+
+bool Line_Follow_StartRamped(float target_speed_mm_s,
+                             float start_accel_mm_s2,
+                             float stop_decel_mm_s2)
+{
+    if (!isfinite(target_speed_mm_s) || target_speed_mm_s <= 0.0f ||
+        !isfinite(start_accel_mm_s2) || start_accel_mm_s2 <= 0.0f ||
+        !isfinite(stop_decel_mm_s2) || stop_decel_mm_s2 <= 0.0f)
+    {
+        return false;
+    }
+
+    line_follow_state.requested_base_speed_mm_s = target_speed_mm_s;
+    line_follow_state.base_speed_mm_s = 0.0f;
+    line_follow_state.start_accel_mm_s2 = start_accel_mm_s2;
+    line_follow_state.stop_decel_mm_s2 = stop_decel_mm_s2;
+    line_follow_state.soft_motion_enabled = true;
+    line_follow_state.startup_ramp_active = true;
+    line_follow_state.smooth_stop_requested = false;
+    return true;
+}
+
+bool Line_Follow_RequestSmoothStop(void)
+{
+    if (!line_follow_state.soft_motion_enabled)
+    {
+        return false;
+    }
+
+    line_follow_state.requested_base_speed_mm_s = 0.0f;
+    line_follow_state.startup_ramp_active = false;
+    line_follow_state.smooth_stop_requested = true;
+    return true;
+}
+
+float Line_Follow_GetSmoothStopDistanceMm(void)
+{
+    float vehicle_speed_mm_s;
+
+    if (!line_follow_state.soft_motion_enabled ||
+        !isfinite(line_follow_state.stop_decel_mm_s2) ||
+        line_follow_state.stop_decel_mm_s2 <= 0.0f)
+    {
+        return 0.0f;
+    }
+
+    vehicle_speed_mm_s = (fabsf(current_L_speed) + fabsf(current_R_speed)) * 0.5f;
+    return (vehicle_speed_mm_s * vehicle_speed_mm_s) /
+           (2.0f * line_follow_state.stop_decel_mm_s2);
+}
+
+bool Line_Follow_IsSmoothStopComplete(void)
+{
+    return line_follow_state.smooth_stop_requested &&
+           line_follow_state.base_speed_mm_s <= 0.0f &&
+           fabsf(current_L_speed) <= LINE_SOFT_STOP_SPEED_EPSILON_MM_S &&
+           fabsf(current_R_speed) <= LINE_SOFT_STOP_SPEED_EPSILON_MM_S;
 }
 
 static float Line_Follow_Clamp(float value, float minimum, float maximum)
@@ -475,23 +549,43 @@ static float Line_Follow_UpdateBaseSpeed(float deviation)
                           LINE_SPEED_CURVE_GAIN_MM_S * absolute_deviation *
                           absolute_deviation;
     float speed_difference;
+    float acceleration_step = LINE_SPEED_ACCEL_STEP_MM_S;
+    float deceleration_step = LINE_SPEED_DECEL_STEP_MM_S;
 
     target_speed = Line_Follow_Clamp(target_speed,
                                      minimum_speed,
                                      line_follow_state.requested_base_speed_mm_s);
     speed_difference = target_speed - line_follow_state.base_speed_mm_s;
 
-    if (speed_difference < -LINE_SPEED_DECEL_STEP_MM_S)
+    if (line_follow_state.startup_ramp_active)
     {
-        line_follow_state.base_speed_mm_s -= LINE_SPEED_DECEL_STEP_MM_S;
+        acceleration_step = line_follow_state.start_accel_mm_s2 *
+                            (float)LINE_FOLLOW_CONTROL_PERIOD_MS / 1000.0f;
     }
-    else if (speed_difference > LINE_SPEED_ACCEL_STEP_MM_S)
+    if (line_follow_state.smooth_stop_requested)
     {
-        line_follow_state.base_speed_mm_s += LINE_SPEED_ACCEL_STEP_MM_S;
+        deceleration_step = line_follow_state.stop_decel_mm_s2 *
+                            (float)LINE_FOLLOW_CONTROL_PERIOD_MS / 1000.0f;
+    }
+
+    if (speed_difference < -deceleration_step)
+    {
+        line_follow_state.base_speed_mm_s -= deceleration_step;
+    }
+    else if (speed_difference > acceleration_step)
+    {
+        line_follow_state.base_speed_mm_s += acceleration_step;
     }
     else
     {
         line_follow_state.base_speed_mm_s = target_speed;
+    }
+
+    if (line_follow_state.startup_ramp_active &&
+        line_follow_state.base_speed_mm_s >=
+            line_follow_state.requested_base_speed_mm_s)
+    {
+        line_follow_state.startup_ramp_active = false;
     }
 
     return line_follow_state.base_speed_mm_s;
@@ -520,6 +614,19 @@ static float Line_Follow_TurnBoost(float deviation)
 static void Line_Follow_Drive(float base_speed, float correction)
 {
     float correction_limit = base_speed - LINE_MIN_WHEEL_SPEED_MM_S;
+
+    if (correction_limit < 0.0f)
+    {
+        correction_limit = 0.0f;
+    }
+
+    if (line_follow_state.smooth_stop_requested &&
+        LINE_SOFT_STOP_TURN_FADE_SPEED_MM_S > 0.0f &&
+        base_speed < LINE_SOFT_STOP_TURN_FADE_SPEED_MM_S)
+    {
+        correction_limit *= base_speed /
+                            LINE_SOFT_STOP_TURN_FADE_SPEED_MM_S;
+    }
 
     correction = Line_Follow_Clamp(correction,
                                    -correction_limit,
@@ -693,6 +800,13 @@ void Line_Follow_Control(void)
 
 	if (status != GRAYSCALE_STATUS_OK || !frame.line_detected)
 	{
+		if (line_follow_state.smooth_stop_requested)
+		{
+			base_speed = Line_Follow_UpdateBaseSpeed(0.0f);
+			PID_ResetState(&pid_Turn, 0.0f);
+			Line_Follow_Drive(base_speed, 0.0f);
+			return;
+		}
 		(void)Line_Follow_HandleLineLoss(status);
 		return;
 	}

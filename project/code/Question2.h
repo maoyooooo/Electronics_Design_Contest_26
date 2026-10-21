@@ -3,7 +3,7 @@
 
 #include "zf_common_headfile.h"
 
-#define QUESTION2_LAP_DISTANCE_MM          (6000.0f)
+#define QUESTION2_LAP_DISTANCE_MM          (6010.0f)
 #define QUESTION2_TARGET_SPEED_MM_S         (400.0f)
 #define QUESTION2_TIME_TICK_MS             (10U)
 #define QUESTION2_DISPLAY_PERIOD_MS        (100U)

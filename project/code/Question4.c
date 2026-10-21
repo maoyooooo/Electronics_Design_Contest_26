@@ -7,6 +7,8 @@ typedef struct
     uint32 last_display_ms;
     float distance_mm;
     volatile bool stopped;
+    volatile bool time_frozen;
+    bool slowing_down;
     bool display_pending;
 } question4_state_t;
 
@@ -21,7 +23,11 @@ void Question4_Init(void)
     question4_state.elapsed_ms = 0U;
     question4_state.last_display_ms = 0U;
     question4_state.distance_mm = 0.0f;
-    question4_state.stopped = !Line_Follow_SetBaseSpeed(QUESTION4_TARGET_SPEED_MM_S);
+    question4_state.time_frozen = false;
+    question4_state.stopped = !Line_Follow_StartRamped(QUESTION4_TARGET_SPEED_MM_S,
+                                                         LINE_SOFT_START_ACCEL_MM_S2,
+                                                         LINE_SOFT_STOP_DECEL_MM_S2);
+    question4_state.slowing_down = false;
     question4_state.display_pending = true;
 
     if (question4_state.stopped)
@@ -33,6 +39,7 @@ void Question4_Init(void)
 void Question4_Update(void)
 {
     encoder_distance_t distance;
+    float stop_distance_mm;
 
     if (question4_state.stopped)
     {
@@ -50,20 +57,44 @@ void Question4_Update(void)
 
     question4_state.distance_mm = (distance.left_mm + distance.right_mm) * 0.5f;
 
-    if (question4_state.distance_mm >= QUESTION4_TARGET_DISTANCE_MM)
+    if (!question4_state.time_frozen &&
+        question4_state.distance_mm >= QUESTION4_TARGET_DISTANCE_MM)
+    {
+        question4_state.time_frozen = true;
+        question4_state.display_pending = true;
+    }
+
+    if (!question4_state.slowing_down)
+    {
+        stop_distance_mm = Line_Follow_GetSmoothStopDistanceMm() +
+                           QUESTION4_SOFT_STOP_MARGIN_MM;
+        if (question4_state.distance_mm >=
+            QUESTION4_TARGET_DISTANCE_MM - stop_distance_mm)
+        {
+            question4_state.slowing_down = Line_Follow_RequestSmoothStop();
+            if (!question4_state.slowing_down)
+            {
+                question4_state.stopped = true;
+                question4_state.display_pending = true;
+                Motor_Stop();
+                return;
+            }
+        }
+    }
+
+    Line_Follow_Control();
+
+    if (question4_state.slowing_down && Line_Follow_IsSmoothStopComplete())
     {
         question4_state.stopped = true;
         question4_state.display_pending = true;
         Motor_Stop();
-        return;
     }
-
-    Line_Follow_Control();
 }
 
 void Question4_TimerTick10ms(void)
 {
-    if (!question4_state.stopped)
+    if (!question4_state.stopped && !question4_state.time_frozen)
     {
         question4_state.elapsed_ms += QUESTION4_TIME_TICK_MS;
     }
@@ -89,7 +120,8 @@ void Question4_Display(void)
     ips200_show_float(42U, 88U, Motor1_Speed, 3U, 1U);
     ips200_show_string(10U, 114U, "VR:");
     ips200_show_float(42U, 114U, Motor2_Speed, 3U, 1U);
-    ips200_show_string(10U, 140U, question4_state.stopped ? "STOP" : "RUN ");
+    ips200_show_string(10U, 140U, question4_state.stopped ? "STOP" :
+                                      (question4_state.slowing_down ? "SLOW" : "RUN "));
 
     question4_state.last_display_ms = elapsed_ms;
     question4_state.display_pending = false;

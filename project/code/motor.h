@@ -74,6 +74,10 @@ void Set_PID_Param(pid_t *pid, float P, float I,float D);
 #define LINE_SPEED_CURVE_GAIN_MM_S      (18.0f)         // 速度曲线增益，单位 mm/s
 #define LINE_SPEED_DECEL_STEP_MM_S      (25.0f)         // 最大减速步长，单位 mm/s
 #define LINE_SPEED_ACCEL_STEP_MM_S      (5.0f)          // 最大加速步长，单位 mm/s
+#define LINE_SOFT_START_ACCEL_MM_S2     (200.0f)
+#define LINE_SOFT_STOP_DECEL_MM_S2      (200.0f)
+#define LINE_SOFT_STOP_SPEED_EPSILON_MM_S (10.0f)
+#define LINE_SOFT_STOP_TURN_FADE_SPEED_MM_S (80.0f)
 #define LINE_TURN_BOOST_START_DEVIATION (1.5f)          // 开始转向增益的偏差阈值，单位 mm
 #define LINE_TURN_BOOST_FULL_DEVIATION  (2.5f)          // 完全转向增益的偏差阈值，单位 mm
 #define LINE_TURN_BOOST_MAX             (1.5f)         // 最大转向增益倍率，单位倍
@@ -130,6 +134,12 @@ void Motor_SpeedPid_ResetActiveProfile(void);
 motor_speed_pid_profile_t Motor_SpeedPid_GetActiveProfile(void);
 void Line_Follow_ResetState(void);
 bool Line_Follow_SetBaseSpeed(float base_speed_mm_s);
+bool Line_Follow_StartRamped(float target_speed_mm_s,
+                             float start_accel_mm_s2,
+                             float stop_decel_mm_s2);
+bool Line_Follow_RequestSmoothStop(void);
+float Line_Follow_GetSmoothStopDistanceMm(void);
+bool Line_Follow_IsSmoothStopComplete(void);
 void Line_Follow_Control(void);
 // 仅从主循环/普通函数调用；IMU 角度更新中断必须保持运行。
 // relative_angle > 0 表示 angle_Z 正方向，返回 true 表示到位，false 表示输入异常或超时。

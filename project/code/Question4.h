@@ -3,8 +3,9 @@
 
 #include "zf_common_headfile.h"
 
-#define QUESTION4_TARGET_DISTANCE_MM       (1800.0f)
-#define QUESTION4_TARGET_SPEED_MM_S        (280.0f)
+#define QUESTION4_TARGET_DISTANCE_MM       (1650.0f)
+#define QUESTION4_TARGET_SPEED_MM_S        (370.0f)
+#define QUESTION4_SOFT_STOP_MARGIN_MM      (20.0f)
 #define QUESTION4_TIME_TICK_MS             (10U)
 #define QUESTION4_DISPLAY_PERIOD_MS        (100U)
 

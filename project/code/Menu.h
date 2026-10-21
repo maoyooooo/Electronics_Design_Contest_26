@@ -4,6 +4,8 @@
 #include "zf_common_headfile.h"
 
 #define MENU_KEY_SCAN_PERIOD_MS            (10U)
+#define MENU_STABILIZATION_DELAY_MS         (2000U)
+#define MENU_STABILIZATION_DISPLAY_PERIOD_MS (100U)
 
 void Menu_Init(void);
 void Menu_Update(void);

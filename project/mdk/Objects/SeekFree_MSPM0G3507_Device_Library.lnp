@@ -5,6 +5,7 @@
 ".\objects\question5.o"
 ".\objects\question6.o"
 ".\objects\menu.o"
+".\objects\task_notify.o"
 ".\objects\encoder.o"
 ".\objects\kalman.o"
 ".\objects\grayscale_sensor.o"
